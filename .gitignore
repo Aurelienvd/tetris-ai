@@ -1,0 +1,8 @@
+#Ignore gedit files
+*~
+
+#Ignore python comp file
+*.pyc
+
+#Ignore pycharm files
+.idea/*
