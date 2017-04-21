@@ -1,4 +1,5 @@
 import pygame, sys
+from pygame.locals import *
 
 def window_init():
 	pygame.init()
@@ -6,6 +7,7 @@ def window_init():
 	can = pygame.display.set_mode(size)
 	can.fill((255,218,185))
 	pygame.display.update()
+	pygame.key.set_repeat(10, 50)
 	return can
 
 def main():
@@ -20,14 +22,18 @@ def main():
 			if event.type == pygame.QUIT:
 				pygame.quit()
 				sys.exit()
-			"""elif(event.type == pygame.KEYDOWN):
-				if (event.)
-			"""
-		x = x+2
-		y = y+2
+			elif(event.type == pygame.KEYDOWN):
+				if (event.key == K_RIGHT):
+					x = x + 10
+				if (event.key == K_LEFT):
+					x = x - 10
+				if (event.key == K_UP):
+					y = y - 10
+				if (event.key == K_DOWN):
+					y = y + 10
 		main_can.fill((255,218,185))
 		main_can.blit(rect, (x,y))
-		pygame.time.delay(200)
+		pygame.time.delay(10)
 		pygame.display.update()
 
 if __name__ == "__main__":
