@@ -1,6 +1,7 @@
 import pygame, sys
 from pygame.locals import *
 
+
 def window_init():
 	pygame.init()
 	size = width, height = 960, 720
@@ -14,9 +15,8 @@ def main():
 	main_can = window_init()
 	rect = pygame.Surface((200,250))
 	rect.fill((0,0,200))
-	main_can.blit(rect, (0,0))
-	x = 0
-	y = 0
+	r = rect.get_rect()
+	speed = [1,1]
 	while 1:
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
@@ -31,9 +31,10 @@ def main():
 					y = y - 10
 				if (event.key == K_DOWN):
 					y = y + 10
+		r.move_ip(speed)
 		main_can.fill((255,218,185))
-		main_can.blit(rect, (x,y))
-		pygame.time.delay(10)
+		main_can.blit(rect, r)
+		pygame.time.delay(200)
 		pygame.display.update()
 
 if __name__ == "__main__":
