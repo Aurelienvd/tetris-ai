@@ -5,6 +5,7 @@
 
 import random, time, pygame, sys
 from pygame.locals import *
+from agent import *
 
 FPS = 25
 WINDOWWIDTH = 920
@@ -165,11 +166,13 @@ def main():
     pygame.display.set_caption('Tetromino')
 
     while True: # game loop
-        runGame()
-        showTextScreen('Game Over')
+        agent = TetrisAgent()
+        runGame(agent)
+        agent.set_terminate_flag()
 
 
-def runGame():
+
+def runGame(agent):
     # setup variables for the start of the game
     board = getBlankBoard()
     lastMoveDownTime = time.time()
@@ -183,6 +186,7 @@ def runGame():
 
     fallingPiece = getNewPiece()
     nextPiece = getNewPiece()
+    agent.start()
 
     while True: # game loop
         if fallingPiece == None:
@@ -197,13 +201,7 @@ def runGame():
         checkForQuit()
         for event in pygame.event.get(): # event handling loop
             if event.type == KEYUP:
-                if (event.key == K_p):
-                    # Pausing the game
-                    DISPLAYSURF.fill(BGCOLOR)
-                    lastFallTime = time.time()
-                    lastMoveDownTime = time.time()
-                    lastMoveSidewaysTime = time.time()
-                elif (event.key == K_LEFT or event.key == K_a):
+                if (event.key == K_LEFT or event.key == K_a):
                     movingLeft = False
                 elif (event.key == K_RIGHT or event.key == K_d):
                     movingRight = False
