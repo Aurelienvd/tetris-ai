@@ -183,6 +183,7 @@ def runGame(agent):
     movingRight = False
     score = 0
     level, fallFreq = calculateLevelAndFallFreq(score)
+    colHeights = [0]*BOARDWIDTH
 
     fallingPiece = getNewPiece()
     nextPiece = getNewPiece()
@@ -266,7 +267,7 @@ def runGame(agent):
             # see if the piece has landed
             if not isValidPosition(board, fallingPiece, adjY=1):
                 # falling piece has landed, set it on the board
-                addToBoard(board, fallingPiece)
+                addToBoard(board, fallingPiece, colHeights)
                 score += removeCompleteLines(board)
                 level, fallFreq = calculateLevelAndFallFreq(score)
                 fallingPiece = None
@@ -335,13 +336,19 @@ def getNewPiece():
     return newPiece
 
 
-def addToBoard(board, piece):
+def addToBoard(board, piece, colHeights):
     # fill in the board based on piece's location, shape, and rotation
+    lastXPos = -1
     for x in range(TEMPLATEWIDTH):
         for y in range(TEMPLATEHEIGHT):
             if PIECES[piece['shape']][piece['rotation']][y][x] != BLANK:
-                board[x + piece['x']][y + piece['y']] = piece['color']
-
+                nextYPos = y + piece['y']
+                nextXPos = x + piece['x']
+                if lastXPos != nextXPos:
+                    colHeights[nextXPos] = nextYPos
+                    lastXPos = nextXPos
+                board[nextXPos][nextYPos] = piece['color']
+    print(colHeights)
 
 def getBlankBoard():
     # create and return a new blank board data structure
