@@ -4,7 +4,7 @@ from threading import *
 import random
 from pygame.locals import *
 
-KEYS = (K_RIGHT, K_DOWN, K_LEFT)
+KEYS = (K_RIGHT, K_LEFT, K_UP)
 
 class TetrisAgent(Thread):
 
@@ -21,5 +21,6 @@ class TetrisAgent(Thread):
 
 	def run(self):
 		while(not self.terminate_flag):
+			pygame.event.post(pygame.event.Event(KEYDOWN, {"key" : K_DOWN}))
 			pygame.event.post(pygame.event.Event(KEYDOWN, {"key" : self.get_next_key()}))
 			time.sleep(0.05)
