@@ -16,23 +16,22 @@ class TetrisAgent():
 
 	def best(self, piece, nextPiece):
 		# dummy behavior just to check if it works properly.
+		
 		best = None
 		bestScore = None
 		workingPiece = piece.clone()
 		
 		
 		for i in range(4):
-			#may be fucked up here
 			workingPiece.rotate((workingPiece.get_rotation() + 1) % len(PIECES[workingPiece.get_shape()]))
 			
 			workingBoard = self.board.clone()
 
-			while (workingBoard.isValidPosition(piece, -1)):
+			while (workingBoard.isValidPosition(workingPiece, -1)):
 				workingPiece.move_left(1)
 			
-			while (workingBoard.isValidPosition(piece, 0, 1)):
+			while (workingBoard.isValidPosition(workingPiece, 0, 1)):
 
-				
 				workingBoard.fallDown(workingPiece)
 
 				score = 0
@@ -48,5 +47,6 @@ class TetrisAgent():
 				workingPiece.move_right(1)
 
 		piece = best.clone()
+		
 
 		

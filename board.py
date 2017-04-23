@@ -230,7 +230,7 @@ class Board():
 			b += abs(self.colHeights[i+1] - self.colHeights[i])
 		return b
 
-	def computeAggregate():
+	def computeAggregate(self):
 		return sum(self.colHeights)
 
 	def refreshColHeights(self, completeLines):

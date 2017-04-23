@@ -51,7 +51,8 @@ def runGame():
 
 	fallingPiece = board.getNewPiece()
 	nextPiece = board.getNewPiece()
-
+	agent.best(fallingPiece, nextPiece)
+	
 	while True: # game loop
 		if fallingPiece == None:
 			# No falling piece in play, so start a new piece at the top
@@ -63,7 +64,7 @@ def runGame():
 				return # can't fit a new piece on the board, so game over
 
 		checkForQuit()
-		agent.best(fallingPiece, nextPiece)
+		#agent.best(fallingPiece, nextPiece)
 
 		# let the piece fall if it is time to fall
 		if time.time() - lastFallTime > fallFreq:
