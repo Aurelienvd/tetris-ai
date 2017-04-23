@@ -30,7 +30,7 @@ class TetrisAgent():
 			while (workingBoard.isValidPosition(workingPiece, -1)):
 				workingPiece.move_left(1)
 			
-			while (workingBoard.isValidPosition(workingPiece, 0, 1)):
+			while (workingBoard.isValidPosition(workingPiece, 1)):
 
 				workingBoard.fallDown(workingPiece)
 
@@ -45,6 +45,8 @@ class TetrisAgent():
 					best = workingPiece.clone()
 
 				workingPiece.move_right(1)
+		if(best != None):
+			best.set_y(0)
 
 		return (best.clone() if best != None else piece)
 		

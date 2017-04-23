@@ -48,39 +48,18 @@ def runGame():
 	movingRight = False
 	score = 0
 	level, fallFreq = calculateLevelAndFallFreq(score)
-
-	fallingPiece = board.getNewPiece()
-	nextPiece = board.getNewPiece()
 	
 	while True: # game loop
-		if fallingPiece == None:
-			# No falling piece in play, so start a new piece at the top
-			fallingPiece = nextPiece
-			nextPiece = board.getNewPiece()
-			lastFallTime = time.time() # reset lastFallTime
-
-			if not board.isValidPosition(fallingPiece):
-				return # can't fit a new piece on the board, so game over
+		fallingPiece = board.getNewPiece()
+		nextPiece = board.getNewPiece()
+			
+		if not board.isValidPosition(fallingPiece):
+			return # can't fit a new piece on the board, so game over
 
 		checkForQuit()
 		fallingPiece = agent.best(fallingPiece, nextPiece)
-
-		# let the piece fall if it is time to fall
-		if time.time() - lastFallTime > fallFreq:
-			# see if the piece has landed
-			if not board.isValidPosition(fallingPiece, adjY=1):
-				# falling piece has landed, set it on the board
-				board.addToBoard(fallingPiece)
-				completeLines = board.removeCompleteLines()
-				if completeLines != 0:
-					board.refreshColHeights(completeLines)
-				score += completeLines
-				level, fallFreq = calculateLevelAndFallFreq(score)
-				fallingPiece = None
-			else:
-				# piece did not land, just move the piece down
-				fallingPiece.move_down()
-				lastFallTime = time.time()
+		board.fallDown(fallingPiece)
+		board.addToBoard(fallingPiece)
 
 		# drawing everything on the screen
 		DISPLAYSURF.fill(BGCOLOR)
@@ -91,6 +70,7 @@ def runGame():
 			drawPiece(fallingPiece)
 
 		pygame.display.update()
+		time.sleep(0.1)
 		FPSCLOCK.tick(FPS)
 
 def makeTextObjs(text, font, color):

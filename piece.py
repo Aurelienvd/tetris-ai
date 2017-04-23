@@ -20,6 +20,9 @@ class Piece:
 	def get_y(self):
 		return self.y
 
+	def set_y(self, ny):
+		self.y = ny
+
 	def get_color(self):
 		return self.color
 
