@@ -51,7 +51,6 @@ def runGame():
 
 	fallingPiece = board.getNewPiece()
 	nextPiece = board.getNewPiece()
-	agent.best(fallingPiece, nextPiece)
 	
 	while True: # game loop
 		if fallingPiece == None:
@@ -64,7 +63,7 @@ def runGame():
 				return # can't fit a new piece on the board, so game over
 
 		checkForQuit()
-		#agent.best(fallingPiece, nextPiece)
+		fallingPiece = agent.best(fallingPiece, nextPiece)
 
 		# let the piece fall if it is time to fall
 		if time.time() - lastFallTime > fallFreq:
@@ -93,7 +92,6 @@ def runGame():
 
 		pygame.display.update()
 		FPSCLOCK.tick(FPS)
-	agent.set_terminate_flag()
 
 def makeTextObjs(text, font, color):
 	surf = font.render(text, True, color)

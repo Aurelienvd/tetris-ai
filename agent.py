@@ -46,7 +46,7 @@ class TetrisAgent():
 
 				workingPiece.move_right(1)
 
-		piece = best.clone()
+		return (best.clone() if best != None else piece)
 		
 
 		
