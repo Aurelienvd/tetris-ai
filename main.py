@@ -155,6 +155,12 @@ PIECES = {'S': S_SHAPE_TEMPLATE,
           'O': O_SHAPE_TEMPLATE,
           'T': T_SHAPE_TEMPLATE}
 
+#AI params
+a = -0.510066
+b = 0.760666
+c = -0.35663
+d = -0.184483
+
 
 def main():
     global FPSCLOCK, DISPLAYSURF, BASICFONT, BIGFONT
@@ -183,11 +189,16 @@ def runGame(agent):
     movingRight = False
     score = 0
     level, fallFreq = calculateLevelAndFallFreq(score)
+
+    #AI vars
     colHeights = [0]*BOARDWIDTH
+    holes = 0
+    aggregateHeight = 0
+    bumpiness = 0
 
     fallingPiece = getNewPiece()
     nextPiece = getNewPiece()
-    agent.start()
+    #agent.start()
 
     while True: # game loop
         if fallingPiece == None:
@@ -268,10 +279,15 @@ def runGame(agent):
             if not isValidPosition(board, fallingPiece, adjY=1):
                 # falling piece has landed, set it on the board
                 addToBoard(board, fallingPiece, colHeights)
-                score += removeCompleteLines(board)
+                aggregateHeight = sum(colHeights)
+                bumpiness = computeBumpiness(colHeights)
+                completeLines = removeCompleteLines(board)
+                if completeLines != 0:
+                    refreshColHeights(completeLines, colHeights)
+                score += completeLines
                 level, fallFreq = calculateLevelAndFallFreq(score)
                 fallingPiece = None
-                computeHoles(board)
+                holes = computeHoles(board)
             else:
                 # piece did not land, just move the piece down
                 fallingPiece['y'] += 1
@@ -298,6 +314,12 @@ def computeHoles(board):
                         L += 1
                         break
     return L
+
+def computeBumpiness(colHeights):
+    b = 0
+    for i in range(len(colHeights)-1):
+        b += abs(colHeights[i+1] - colHeights[i])
+    return b
 
 def makeTextObjs(text, font, color):
     surf = font.render(text, True, color)
@@ -356,7 +378,7 @@ def addToBoard(board, piece, colHeights):
                 nextYPos = y + piece['y']
                 nextXPos = x + piece['x']
                 if lastXPos != nextXPos:
-                    colHeights[nextXPos] = nextYPos
+                    colHeights[nextXPos] = BOARDHEIGHT - nextYPos
                     lastXPos = nextXPos
                 board[nextXPos][nextYPos] = piece['color']
 
@@ -414,6 +436,13 @@ def removeCompleteLines(board):
             y -= 1 # move on to check next row up
     return numLinesRemoved
 
+def refreshColHeights(completeLines, colHeights):
+    for i in range(len(colHeights)):
+        res = colHeights[i] - completeLines
+        if res <= 0:
+            colHeights[i] = 0 
+        else:
+            colHeights[i] = res
 
 def convertToPixelCoords(boxx, boxy):
     # Convert the given xy coordinates of the board to xy
