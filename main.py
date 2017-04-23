@@ -271,6 +271,7 @@ def runGame(agent):
                 score += removeCompleteLines(board)
                 level, fallFreq = calculateLevelAndFallFreq(score)
                 fallingPiece = None
+                computeHoles(board)
             else:
                 # piece did not land, just move the piece down
                 fallingPiece['y'] += 1
@@ -287,6 +288,16 @@ def runGame(agent):
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
+def computeHoles(board):
+    L = 0
+    for x in range(BOARDWIDTH):
+        for y in range(BOARDHEIGHT):
+            if board[x][y] == BLANK:
+                for yAbove in board[x][:y]:
+                    if yAbove != BLANK:
+                        L += 1
+                        break
+    return L
 
 def makeTextObjs(text, font, color):
     surf = font.render(text, True, color)
@@ -348,7 +359,6 @@ def addToBoard(board, piece, colHeights):
                     colHeights[nextXPos] = nextYPos
                     lastXPos = nextXPos
                 board[nextXPos][nextYPos] = piece['color']
-    print(colHeights)
 
 def getBlankBoard():
     # create and return a new blank board data structure
