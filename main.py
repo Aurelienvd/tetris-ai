@@ -57,7 +57,9 @@ def runGame():
 			return # can't fit a new piece on the board, so game over
 
 		checkForQuit()
+		begin = time.time()
 		fallingPiece = agent.best(fallingPiece, nextPiece)
+		print(time.time()-begin)
 		board.fallDown(fallingPiece)
 		board.addToBoard(fallingPiece)
 		completeLines = board.removeCompleteLines()
@@ -74,7 +76,7 @@ def runGame():
 			drawPiece(fallingPiece)
 
 		pygame.display.update()
-		time.sleep(0.1)
+		time.sleep(2)
 		FPSCLOCK.tick(FPS)
 
 def makeTextObjs(text, font, color):
