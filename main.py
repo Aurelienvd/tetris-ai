@@ -19,25 +19,7 @@ MOVEDOWNFREQ = 0.1
 XMARGIN = int((WINDOWWIDTH - BOARDWIDTH * BOXSIZE) / 2)
 TOPMARGIN = WINDOWHEIGHT - (BOARDHEIGHT * BOXSIZE) - 5
 
-#               R    G    B
-WHITE       = (255, 255, 255)
-GRAY        = (185, 185, 185)
-BLACK       = (  0,   0,   0)
-RED         = (155,   0,   0)
-LIGHTRED    = (175,  20,  20)
-GREEN       = (  0, 155,   0)
-LIGHTGREEN  = ( 20, 175,  20)
-BLUE        = (  0,   0, 155)
-LIGHTBLUE   = ( 20,  20, 175)
-YELLOW      = (155, 155,   0)
-LIGHTYELLOW = (175, 175,  20)
 
-BORDERCOLOR = BLUE
-BGCOLOR = BLACK
-TEXTCOLOR = WHITE
-TEXTSHADOWCOLOR = GRAY
-COLORS      = (     BLUE,      GREEN,      RED,      YELLOW)
-LIGHTCOLORS = (LIGHTBLUE, LIGHTGREEN, LIGHTRED, LIGHTYELLOW)
 assert len(COLORS) == len(LIGHTCOLORS) # each color must have light color
 
 
@@ -50,13 +32,14 @@ def main():
     BIGFONT = pygame.font.Font('freesansbold.ttf', 100)
     pygame.display.set_caption('Tetromino')
     while True: # game loop
-        agent = TetrisAgent()
-        runGame(agent)
-        agent.set_terminate_flag()
+        
+        runGame()
+        
 
-def runGame(agent):
+def runGame():
     # setup variables for the start of the game
     board = Board()
+    agent = TetrisAgent(board)
     lastMoveDownTime = time.time()
     lastMoveSidewaysTime = time.time()
     lastFallTime = time.time()
@@ -72,15 +55,15 @@ def runGame(agent):
     aggregateHeight = 0
     bumpiness = 0
 
-    fallingPiece = getNewPiece()
-    nextPiece = getNewPiece()
+    fallingPiece = board.getNewPiece()
+    nextPiece = board.getNewPiece()
     agent.start()
 
     while True: # game loop
         if fallingPiece == None:
             # No falling piece in play, so start a new piece at the top
             fallingPiece = nextPiece
-            nextPiece = getNewPiece()
+            nextPiece = board.getNewPiece()
             lastFallTime = time.time() # reset lastFallTime
 
             if not board.isValidPosition(fallingPiece):
@@ -179,6 +162,7 @@ def runGame(agent):
 
         pygame.display.update()
         FPSCLOCK.tick(FPS)
+    agent.set_terminate_flag()
 
 def makeTextObjs(text, font, color):
     surf = font.render(text, True, color)
@@ -216,16 +200,6 @@ def calculateLevelAndFallFreq(score):
     level = int(score / 10) + 1
     fallFreq = 0.27 - (level * 0.02)
     return level, fallFreq
-
-def getNewPiece():
-    # return a random new piece in a random rotation and color
-    shape = random.choice(list(PIECES.keys()))
-    newPiece = {'shape': shape,
-                'rotation': random.randint(0, len(PIECES[shape]) - 1),
-                'x': int(BOARDWIDTH / 2) - int(TEMPLATEWIDTH / 2),
-                'y': -2, # start it above the board (i.e. less than 0)
-                'color': random.randint(0, len(COLORS)-1)}
-    return newPiece
 
 def convertToPixelCoords(boxx, boxy):
     # Convert the given xy coordinates of the board to xy

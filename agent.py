@@ -13,9 +13,10 @@ d = -0.184483
 
 class TetrisAgent(Thread):
 
-	def __init__(self):
+	def __init__(self, board):
 		Thread.__init__(self)
 		self.terminate_flag = 0
+		self.board = board
 		pass
 
 	def get_next_key(self):
@@ -29,3 +30,4 @@ class TetrisAgent(Thread):
 			pygame.event.post(pygame.event.Event(KEYDOWN, {"key" : K_DOWN}))
 			pygame.event.post(pygame.event.Event(KEYDOWN, {"key" : self.get_next_key()}))
 			time.sleep(0.05)
+
