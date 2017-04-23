@@ -1,4 +1,5 @@
 import random
+from piece import *
 
 BOARDWIDTH = 10
 BOARDHEIGHT = 20
@@ -149,39 +150,35 @@ class Board():
 	def isOnBoard(self, x, y):
 		return x >= 0 and x < BOARDWIDTH and y < BOARDHEIGHT
 
-   	def addToBoard(self, piece, colHeights):
-   		# fill in the board based on piece's location, shape, and rotation
+	def addToBoard(self, piece, colHeights):
+		# fill in the board based on piece's location, shape, and rotation
 		lastXPos = -1
 		for x in range(TEMPLATEWIDTH):
 			for y in range(TEMPLATEHEIGHT):
-				if PIECES[piece['shape']][piece['rotation']][y][x] != BLANK:
-					nextYPos = y + piece['y']
-					nextXPos = x + piece['x']
+				if PIECES[piece.get_shape()][piece.get_rotation()][y][x] != BLANK:
+					nextYPos = y + piece.get_y()
+					nextXPos = x + piece.get_x()
 					if lastXPos != nextXPos:
 						colHeights[nextXPos] = BOARDHEIGHT - nextYPos
 						lastXPos = nextXPos
-					self.board[nextXPos][nextYPos] = piece['color']
+					self.board[nextXPos][nextYPos] = piece.get_color()
 
 	def getNewPiece(self):
 		# return a random new piece in a random rotation and color
 		shape = random.choice(list(PIECES.keys()))
-		newPiece = {'shape': shape,
-					'rotation': random.randint(0, len(PIECES[shape]) - 1),
-					'x': int(BOARDWIDTH / 2) - int(TEMPLATEWIDTH / 2),
-					'y': -2, # start it above the board (i.e. less than 0)
-					'color': random.randint(0, len(COLORS)-1)}
+		newPiece = Piece(shape, random.randint(0, len(PIECES[shape])-1), int(BOARDWIDTH/2)-int(TEMPLATEWIDTH/2), -2, random.randint(0, len(COLORS)-1))
 		return newPiece
 
 	def isValidPosition(self, piece, adjX=0, adjY=0):
 		# Return True if the piece is within the board and not colliding
 		for x in range(TEMPLATEWIDTH):
 			for y in range(TEMPLATEHEIGHT):
-				isAboveBoard = y + piece['y'] + adjY < 0
-				if isAboveBoard or PIECES[piece['shape']][piece['rotation']][y][x] == BLANK:
+				isAboveBoard = y + piece.get_y() + adjY < 0
+				if isAboveBoard or PIECES[piece.get_shape()][piece.get_rotation()][y][x] == BLANK:
 					continue
-				if not self.isOnBoard(x + piece['x'] + adjX, y + piece['y'] + adjY):
+				if not self.isOnBoard(x + piece.get_x() + adjX, y + piece.get_y() + adjY):
 					return False
-				if self.board[x + piece['x'] + adjX][y + piece['y'] + adjY] != BLANK:
+				if self.board[x + piece.get_x() + adjX][y + piece.get_y() + adjY] != BLANK:
 					return False
 		return True
 
