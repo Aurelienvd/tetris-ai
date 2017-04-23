@@ -40,7 +40,7 @@ class TetrisAgent():
 
 				score = a*workingBoard.computeAggregate() + b*completedLines + c*workingBoard.computeHoles() + d*workingBoard.computeBumpiness()
 
-				if(score > bestScore or bestScore == None):
+				if(bestScore == None or score > bestScore):
 					bestScore = score
 					best = workingPiece.clone()
 
