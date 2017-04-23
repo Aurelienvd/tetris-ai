@@ -57,7 +57,6 @@ def runGame():
 
 	fallingPiece = board.getNewPiece()
 	nextPiece = board.getNewPiece()
-	agent.start()
 
 	while True: # game loop
 		if fallingPiece == None:
@@ -70,67 +69,7 @@ def runGame():
 				return # can't fit a new piece on the board, so game over
 
 		checkForQuit()
-		for event in pygame.event.get(): # event handling loop
-			if event.type == KEYUP:
-				if (event.key == K_LEFT or event.key == K_a):
-					movingLeft = False
-				elif (event.key == K_RIGHT or event.key == K_d):
-					movingRight = False
-				elif (event.key == K_DOWN or event.key == K_s):
-					movingDown = False
-
-			elif event.type == KEYDOWN:
-				# moving the piece sideways
-				if (event.key == K_LEFT or event.key == K_a) and board.isValidPosition(fallingPiece, adjX=-1):
-					fallingPiece.move_left()
-					movingLeft = True
-					movingRight = False
-					lastMoveSidewaysTime = time.time()
-
-				elif (event.key == K_RIGHT or event.key == K_d) and board.isValidPosition(fallingPiece, adjX=1):
-					fallingPiece.move_right()
-					movingRight = True
-					movingLeft = False
-					lastMoveSidewaysTime = time.time()
-
-				# rotating the piece (if there is room to rotate)
-				elif (event.key == K_UP or event.key == K_w):
-					fallingPiece.rotate((fallingPiece.get_rotation() + 1) % len(PIECES[fallingPiece.get_shape()]))
-					if not board.isValidPosition(fallingPiece):
-						fallingPiece.rotate((fallingPiece.get_rotation() - 1) % len(PIECES[fallingPiece.get_shape()]))
-				elif (event.key == K_q): # rotate the other direction
-					fallingPiece.rotate((fallingPiece.get_rotation() - 1) % len(PIECES[fallingPiece.get_shape()]))
-					if not board.isValidPosition(fallingPiece):
-						fallingPiece.rotate((fallingPiece.get_rotation() + 1) % len(PIECES[fallingPiece.get_shape()]))
-
-				# making the piece fall faster with the down key
-				elif (event.key == K_DOWN or event.key == K_s):
-					movingDown = True
-					if board.isValidPosition(fallingPiece, adjY=1):
-						fallingPiece.move_down()
-					lastMoveDownTime = time.time()
-
-				# move the current piece all the way down
-				elif event.key == K_SPACE:
-					movingDown = False
-					movingLeft = False
-					movingRight = False
-					for i in range(1, BOARDHEIGHT):
-						if not board.isValidPosition(fallingPiece, adjY=i):
-							break
-					fallingPiece.move_down(i - 1)
-
-		# handle moving the piece because of user input
-		if (movingLeft or movingRight) and time.time() - lastMoveSidewaysTime > MOVESIDEWAYSFREQ:
-			if movingLeft and board.isValidPosition(fallingPiece, adjX=-1):
-				fallingPiece.move_left()
-			elif movingRight and board.isValidPosition(fallingPiece, adjX=1):
-				fallingPiece.move_right()
-			lastMoveSidewaysTime = time.time()
-
-		if movingDown and time.time() - lastMoveDownTime > MOVEDOWNFREQ and board.isValidPosition(fallingPiece, adjY=1):
-			fallingPiece.move_down()
-			lastMoveDownTime = time.time()
+		agent.best(fallingPiece, nextPiece)
 
 		# let the piece fall if it is time to fall
 		if time.time() - lastFallTime > fallFreq:

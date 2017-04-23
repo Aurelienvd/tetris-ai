@@ -23,11 +23,11 @@ class Piece:
 	def get_color(self):
 		return self.color
 
-	def move_left(self):
-		self.x = self.x - 1
+	def move_left(self, delta=1):
+		self.x = self.x - delta
 
-	def move_right(self):
-		self.x = self.x + 1
+	def move_right(self, delta=1):
+		self.x = self.x + delta
 
 	def rotate(self, rotation):
 		self.rotation = rotation
