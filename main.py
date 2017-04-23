@@ -60,6 +60,10 @@ def runGame():
 		fallingPiece = agent.best(fallingPiece, nextPiece)
 		board.fallDown(fallingPiece)
 		board.addToBoard(fallingPiece)
+		completeLines = board.removeCompleteLines()
+		if completeLines != 0:
+			board.refreshColHeights(completeLines)
+		score += completeLines
 
 		# drawing everything on the screen
 		DISPLAYSURF.fill(BGCOLOR)

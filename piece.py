@@ -41,3 +41,6 @@ class Piece:
 	def clone(self):
 		return Piece(self.shape, self.rotation, self.x, self.y, self.color)
 
+	def __str__(self):
+		return "\nRotation: {0}, X: {1}, Y: {2}\n".format(self.rotation, self.x, self.y)
+

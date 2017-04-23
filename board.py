@@ -169,7 +169,7 @@ class Board():
 	def getNewPiece(self):
 		# return a random new piece in a random rotation and color
 		shape = random.choice(list(PIECES.keys()))
-		newPiece = Piece(shape, random.randint(0, len(PIECES[shape])-1), int(BOARDWIDTH/2)-int(TEMPLATEWIDTH/2), -2, random.randint(0, len(COLORS)-1))
+		newPiece = Piece(shape, random.randint(0, len(PIECES[shape])-1), int(BOARDWIDTH/2)-int(TEMPLATEWIDTH/2), 0, random.randint(0, len(COLORS)-1))
 		return newPiece
 
 	def isValidPosition(self, piece, adjX=0, adjY=0):
@@ -242,10 +242,16 @@ class Board():
 				self.colHeights[i] = res
 
 	def fallDown(self, piece):
-		for i in range(1, BOARDHEIGHT):
-			if not self.isValidPosition(piece, adjY=i):
-				break
-		piece.move_down(i-1)
+		while(self.isValidPosition(piece, 0, 1)):
+			piece.move_down(1)
+
+	def __str__(self):
+		string = "\n"
+		for row in self.board:
+			for col in row:
+				string += str(col) + ","
+			string += "\n"
+		return string
 
 	def clone(self):
 		return Board(self)
