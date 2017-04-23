@@ -237,5 +237,9 @@ class Board():
 			else:
 				colHeights[i] = res
 
+	def fallDown(self, piece):
+		while(self.isValidPosition(piece, 0, -1)):
+			piece.move_down()
+
 	def clone(self):
 		return Board(self)
