@@ -141,10 +141,11 @@ class Board():
 
 	def __init__(self, oboard = None):
 		self.board = [[BLANK]*BOARDHEIGHT for i in range(BOARDWIDTH)]
+		self.colHeights = [0]*BOARDWIDTH
 		if (oboard != None):
 			for i in range(BOARDWIDTH):
 				for j in range(BOARDHEIGHT):
-					self.board[i][j] = oboard[i][j]
+					self.board[i][j] = oboard.get(i, j)
 
 	def get(self,x,y):
 		return self.board[x][y]
@@ -152,7 +153,7 @@ class Board():
 	def isOnBoard(self, x, y):
 		return x >= 0 and x < BOARDWIDTH and y < BOARDHEIGHT
 
-	def addToBoard(self, piece, colHeights):
+	def addToBoard(self, piece):
 		# fill in the board based on piece's location, shape, and rotation
 		lastXPos = -1
 		for x in range(TEMPLATEWIDTH):
@@ -161,7 +162,7 @@ class Board():
 					nextYPos = y + piece.get_y()
 					nextXPos = x + piece.get_x()
 					if lastXPos != nextXPos:
-						colHeights[nextXPos] = BOARDHEIGHT - nextYPos
+						self.colHeights[nextXPos] = BOARDHEIGHT - nextYPos
 						lastXPos = nextXPos
 					self.board[nextXPos][nextYPos] = piece.get_color()
 
@@ -223,23 +224,28 @@ class Board():
 							break
 		return L
 
-	def computeBumpiness(self, colHeights):
+	def computeBumpiness(self):
 		b = 0
-		for i in range(len(colHeights)-1):
-			b += abs(colHeights[i+1] - colHeights[i])
+		for i in range(len(self.colHeights)-1):
+			b += abs(self.colHeights[i+1] - self.colHeights[i])
 		return b
 
-	def refreshColHeights(self, completeLines, colHeights):
-		for i in range(len(colHeights)):
-			res = colHeights[i] - completeLines
+	def computeAggregate():
+		return sum(self.colHeights)
+
+	def refreshColHeights(self, completeLines):
+		for i in range(len(self.colHeights)):
+			res = self.colHeights[i] - completeLines
 			if res <= 0:
-				colHeights[i] = 0 
+				self.colHeights[i] = 0 
 			else:
-				colHeights[i] = res
+				self.colHeights[i] = res
 
 	def fallDown(self, piece):
-		while(self.isValidPosition(piece, 0, -1)):
-			piece.move_down()
+		for i in range(1, BOARDHEIGHT):
+			if not self.isValidPosition(piece, adjY=i):
+				break
+		piece.move_down(i-1)
 
 	def clone(self):
 		return Board(self)

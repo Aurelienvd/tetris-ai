@@ -49,12 +49,6 @@ def runGame():
 	score = 0
 	level, fallFreq = calculateLevelAndFallFreq(score)
 
-	#AI vars
-	colHeights = [0]*BOARDWIDTH
-	holes = 0
-	aggregateHeight = 0
-	bumpiness = 0
-
 	fallingPiece = board.getNewPiece()
 	nextPiece = board.getNewPiece()
 
@@ -76,16 +70,13 @@ def runGame():
 			# see if the piece has landed
 			if not board.isValidPosition(fallingPiece, adjY=1):
 				# falling piece has landed, set it on the board
-				board.addToBoard(fallingPiece, colHeights)
-				aggregateHeight = sum(colHeights)
-				bumpiness = board.computeBumpiness(colHeights)
+				board.addToBoard(fallingPiece)
 				completeLines = board.removeCompleteLines()
 				if completeLines != 0:
-					board.refreshColHeights(completeLines, colHeights)
+					board.refreshColHeights(completeLines)
 				score += completeLines
 				level, fallFreq = calculateLevelAndFallFreq(score)
 				fallingPiece = None
-				holes = board.computeHoles()
 			else:
 				# piece did not land, just move the piece down
 				fallingPiece.move_down()
