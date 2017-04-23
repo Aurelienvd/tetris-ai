@@ -41,15 +41,6 @@ LIGHTCOLORS = (LIGHTBLUE, LIGHTGREEN, LIGHTRED, LIGHTYELLOW)
 assert len(COLORS) == len(LIGHTCOLORS) # each color must have light color
 
 
-
-
-#AI params
-a = -0.510066
-b = 0.760666
-c = -0.35663
-d = -0.184483
-
-
 def main():
     global FPSCLOCK, DISPLAYSURF, BASICFONT, BIGFONT
     pygame.init()
@@ -62,8 +53,6 @@ def main():
         agent = TetrisAgent()
         runGame(agent)
         agent.set_terminate_flag()
-
-
 
 def runGame(agent):
     # setup variables for the start of the game
