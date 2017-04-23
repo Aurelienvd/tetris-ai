@@ -6,6 +6,11 @@ from pygame.locals import *
 
 KEYS = (K_RIGHT, K_LEFT, K_UP)
 
+a = -0.510066
+b = 0.760666
+c = -0.35663
+d = -0.184483
+
 class TetrisAgent(Thread):
 
 	def __init__(self):

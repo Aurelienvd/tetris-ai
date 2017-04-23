@@ -6,14 +6,12 @@
 import random, time, pygame, sys
 from pygame.locals import *
 from agent import *
+from board import *
 
 FPS = 25
 WINDOWWIDTH = 920
 WINDOWHEIGHT = 780
 BOXSIZE = 38
-BOARDWIDTH = 10
-BOARDHEIGHT = 20
-BLANK = '.'
 
 MOVESIDEWAYSFREQ = 0.15
 MOVEDOWNFREQ = 0.1
@@ -42,118 +40,8 @@ COLORS      = (     BLUE,      GREEN,      RED,      YELLOW)
 LIGHTCOLORS = (LIGHTBLUE, LIGHTGREEN, LIGHTRED, LIGHTYELLOW)
 assert len(COLORS) == len(LIGHTCOLORS) # each color must have light color
 
-TEMPLATEWIDTH = 5
-TEMPLATEHEIGHT = 5
 
-S_SHAPE_TEMPLATE = [['.....',
-                     '.....',
-                     '..OO.',
-                     '.OO..',
-                     '.....'],
-                    ['.....',
-                     '..O..',
-                     '..OO.',
-                     '...O.',
-                     '.....']]
 
-Z_SHAPE_TEMPLATE = [['.....',
-                     '.....',
-                     '.OO..',
-                     '..OO.',
-                     '.....'],
-                    ['.....',
-                     '..O..',
-                     '.OO..',
-                     '.O...',
-                     '.....']]
-
-I_SHAPE_TEMPLATE = [['..O..',
-                     '..O..',
-                     '..O..',
-                     '..O..',
-                     '.....'],
-                    ['.....',
-                     '.....',
-                     'OOOO.',
-                     '.....',
-                     '.....']]
-
-O_SHAPE_TEMPLATE = [['.....',
-                     '.....',
-                     '.OO..',
-                     '.OO..',
-                     '.....']]
-
-J_SHAPE_TEMPLATE = [['.....',
-                     '.O...',
-                     '.OOO.',
-                     '.....',
-                     '.....'],
-                    ['.....',
-                     '..OO.',
-                     '..O..',
-                     '..O..',
-                     '.....'],
-                    ['.....',
-                     '.....',
-                     '.OOO.',
-                     '...O.',
-                     '.....'],
-                    ['.....',
-                     '..O..',
-                     '..O..',
-                     '.OO..',
-                     '.....']]
-
-L_SHAPE_TEMPLATE = [['.....',
-                     '...O.',
-                     '.OOO.',
-                     '.....',
-                     '.....'],
-                    ['.....',
-                     '..O..',
-                     '..O..',
-                     '..OO.',
-                     '.....'],
-                    ['.....',
-                     '.....',
-                     '.OOO.',
-                     '.O...',
-                     '.....'],
-                    ['.....',
-                     '.OO..',
-                     '..O..',
-                     '..O..',
-                     '.....']]
-
-T_SHAPE_TEMPLATE = [['.....',
-                     '..O..',
-                     '.OOO.',
-                     '.....',
-                     '.....'],
-                    ['.....',
-                     '..O..',
-                     '..OO.',
-                     '..O..',
-                     '.....'],
-                    ['.....',
-                     '.....',
-                     '.OOO.',
-                     '..O..',
-                     '.....'],
-                    ['.....',
-                     '..O..',
-                     '.OO..',
-                     '..O..',
-                     '.....']]
-
-PIECES = {'S': S_SHAPE_TEMPLATE,
-          'Z': Z_SHAPE_TEMPLATE,
-          'J': J_SHAPE_TEMPLATE,
-          'L': L_SHAPE_TEMPLATE,
-          'I': I_SHAPE_TEMPLATE,
-          'O': O_SHAPE_TEMPLATE,
-          'T': T_SHAPE_TEMPLATE}
 
 #AI params
 a = -0.510066
@@ -170,7 +58,6 @@ def main():
     BASICFONT = pygame.font.Font('freesansbold.ttf', 18)
     BIGFONT = pygame.font.Font('freesansbold.ttf', 100)
     pygame.display.set_caption('Tetromino')
-
     while True: # game loop
         agent = TetrisAgent()
         runGame(agent)
@@ -180,7 +67,7 @@ def main():
 
 def runGame(agent):
     # setup variables for the start of the game
-    board = getBlankBoard()
+    board = Board()
     lastMoveDownTime = time.time()
     lastMoveSidewaysTime = time.time()
     lastFallTime = time.time()
@@ -198,7 +85,7 @@ def runGame(agent):
 
     fallingPiece = getNewPiece()
     nextPiece = getNewPiece()
-    #agent.start()
+    agent.start()
 
     while True: # game loop
         if fallingPiece == None:
@@ -207,7 +94,7 @@ def runGame(agent):
             nextPiece = getNewPiece()
             lastFallTime = time.time() # reset lastFallTime
 
-            if not isValidPosition(board, fallingPiece):
+            if not board.isValidPosition(fallingPiece):
                 return # can't fit a new piece on the board, so game over
 
         checkForQuit()
@@ -222,13 +109,13 @@ def runGame(agent):
 
             elif event.type == KEYDOWN:
                 # moving the piece sideways
-                if (event.key == K_LEFT or event.key == K_a) and isValidPosition(board, fallingPiece, adjX=-1):
+                if (event.key == K_LEFT or event.key == K_a) and board.isValidPosition(fallingPiece, adjX=-1):
                     fallingPiece['x'] -= 1
                     movingLeft = True
                     movingRight = False
                     lastMoveSidewaysTime = time.time()
 
-                elif (event.key == K_RIGHT or event.key == K_d) and isValidPosition(board, fallingPiece, adjX=1):
+                elif (event.key == K_RIGHT or event.key == K_d) and board.isValidPosition(fallingPiece, adjX=1):
                     fallingPiece['x'] += 1
                     movingRight = True
                     movingLeft = False
@@ -237,17 +124,17 @@ def runGame(agent):
                 # rotating the piece (if there is room to rotate)
                 elif (event.key == K_UP or event.key == K_w):
                     fallingPiece['rotation'] = (fallingPiece['rotation'] + 1) % len(PIECES[fallingPiece['shape']])
-                    if not isValidPosition(board, fallingPiece):
+                    if not board.isValidPosition(fallingPiece):
                         fallingPiece['rotation'] = (fallingPiece['rotation'] - 1) % len(PIECES[fallingPiece['shape']])
                 elif (event.key == K_q): # rotate the other direction
                     fallingPiece['rotation'] = (fallingPiece['rotation'] - 1) % len(PIECES[fallingPiece['shape']])
-                    if not isValidPosition(board, fallingPiece):
+                    if not board.isValidPosition(fallingPiece):
                         fallingPiece['rotation'] = (fallingPiece['rotation'] + 1) % len(PIECES[fallingPiece['shape']])
 
                 # making the piece fall faster with the down key
                 elif (event.key == K_DOWN or event.key == K_s):
                     movingDown = True
-                    if isValidPosition(board, fallingPiece, adjY=1):
+                    if board.isValidPosition(fallingPiece, adjY=1):
                         fallingPiece['y'] += 1
                     lastMoveDownTime = time.time()
 
@@ -257,37 +144,37 @@ def runGame(agent):
                     movingLeft = False
                     movingRight = False
                     for i in range(1, BOARDHEIGHT):
-                        if not isValidPosition(board, fallingPiece, adjY=i):
+                        if not board.isValidPosition(fallingPiece, adjY=i):
                             break
                     fallingPiece['y'] += i - 1
 
         # handle moving the piece because of user input
         if (movingLeft or movingRight) and time.time() - lastMoveSidewaysTime > MOVESIDEWAYSFREQ:
-            if movingLeft and isValidPosition(board, fallingPiece, adjX=-1):
+            if movingLeft and board.isValidPosition(fallingPiece, adjX=-1):
                 fallingPiece['x'] -= 1
-            elif movingRight and isValidPosition(board, fallingPiece, adjX=1):
+            elif movingRight and board.isValidPosition(fallingPiece, adjX=1):
                 fallingPiece['x'] += 1
             lastMoveSidewaysTime = time.time()
 
-        if movingDown and time.time() - lastMoveDownTime > MOVEDOWNFREQ and isValidPosition(board, fallingPiece, adjY=1):
+        if movingDown and time.time() - lastMoveDownTime > MOVEDOWNFREQ and board.isValidPosition(fallingPiece, adjY=1):
             fallingPiece['y'] += 1
             lastMoveDownTime = time.time()
 
         # let the piece fall if it is time to fall
         if time.time() - lastFallTime > fallFreq:
             # see if the piece has landed
-            if not isValidPosition(board, fallingPiece, adjY=1):
+            if not board.isValidPosition(fallingPiece, adjY=1):
                 # falling piece has landed, set it on the board
-                addToBoard(board, fallingPiece, colHeights)
+                board.addToBoard(fallingPiece, colHeights)
                 aggregateHeight = sum(colHeights)
-                bumpiness = computeBumpiness(colHeights)
-                completeLines = removeCompleteLines(board)
+                bumpiness = board.computeBumpiness(colHeights)
+                completeLines = board.removeCompleteLines()
                 if completeLines != 0:
-                    refreshColHeights(completeLines, colHeights)
+                    board.refreshColHeights(completeLines, colHeights)
                 score += completeLines
                 level, fallFreq = calculateLevelAndFallFreq(score)
                 fallingPiece = None
-                holes = computeHoles(board)
+                holes = board.computeHoles()
             else:
                 # piece did not land, just move the piece down
                 fallingPiece['y'] += 1
@@ -303,23 +190,6 @@ def runGame(agent):
 
         pygame.display.update()
         FPSCLOCK.tick(FPS)
-
-def computeHoles(board):
-    L = 0
-    for x in range(BOARDWIDTH):
-        for y in range(BOARDHEIGHT):
-            if board[x][y] == BLANK:
-                for yAbove in board[x][:y]:
-                    if yAbove != BLANK:
-                        L += 1
-                        break
-    return L
-
-def computeBumpiness(colHeights):
-    b = 0
-    for i in range(len(colHeights)-1):
-        b += abs(colHeights[i+1] - colHeights[i])
-    return b
 
 def makeTextObjs(text, font, color):
     surf = font.render(text, True, color)
@@ -368,82 +238,6 @@ def getNewPiece():
                 'color': random.randint(0, len(COLORS)-1)}
     return newPiece
 
-
-def addToBoard(board, piece, colHeights):
-    # fill in the board based on piece's location, shape, and rotation
-    lastXPos = -1
-    for x in range(TEMPLATEWIDTH):
-        for y in range(TEMPLATEHEIGHT):
-            if PIECES[piece['shape']][piece['rotation']][y][x] != BLANK:
-                nextYPos = y + piece['y']
-                nextXPos = x + piece['x']
-                if lastXPos != nextXPos:
-                    colHeights[nextXPos] = BOARDHEIGHT - nextYPos
-                    lastXPos = nextXPos
-                board[nextXPos][nextYPos] = piece['color']
-
-def getBlankBoard():
-    # create and return a new blank board data structure
-    board = []
-    for i in range(BOARDWIDTH):
-        board.append([BLANK] * BOARDHEIGHT)
-    return board
-
-
-def isOnBoard(x, y):
-    return x >= 0 and x < BOARDWIDTH and y < BOARDHEIGHT
-
-
-def isValidPosition(board, piece, adjX=0, adjY=0):
-    # Return True if the piece is within the board and not colliding
-    for x in range(TEMPLATEWIDTH):
-        for y in range(TEMPLATEHEIGHT):
-            isAboveBoard = y + piece['y'] + adjY < 0
-            if isAboveBoard or PIECES[piece['shape']][piece['rotation']][y][x] == BLANK:
-                continue
-            if not isOnBoard(x + piece['x'] + adjX, y + piece['y'] + adjY):
-                return False
-            if board[x + piece['x'] + adjX][y + piece['y'] + adjY] != BLANK:
-                return False
-    return True
-
-def isCompleteLine(board, y):
-    # Return True if the line filled with boxes with no gaps.
-    for x in range(BOARDWIDTH):
-        if board[x][y] == BLANK:
-            return False
-    return True
-
-
-def removeCompleteLines(board):
-    # Remove any completed lines on the board, move everything above them down, and return the number of complete lines.
-    numLinesRemoved = 0
-    y = BOARDHEIGHT - 1 # start y at the bottom of the board
-    while y >= 0:
-        if isCompleteLine(board, y):
-            # Remove the line and pull boxes down by one line.
-            for pullDownY in range(y, 0, -1):
-                for x in range(BOARDWIDTH):
-                    board[x][pullDownY] = board[x][pullDownY-1]
-            # Set very top line to blank.
-            for x in range(BOARDWIDTH):
-                board[x][0] = BLANK
-            numLinesRemoved += 1
-            # Note on the next iteration of the loop, y is the same.
-            # This is so that if the line that was pulled down is also
-            # complete, it will be removed.
-        else:
-            y -= 1 # move on to check next row up
-    return numLinesRemoved
-
-def refreshColHeights(completeLines, colHeights):
-    for i in range(len(colHeights)):
-        res = colHeights[i] - completeLines
-        if res <= 0:
-            colHeights[i] = 0 
-        else:
-            colHeights[i] = res
-
 def convertToPixelCoords(boxx, boxy):
     # Convert the given xy coordinates of the board to xy
     # coordinates of the location on the screen.
@@ -472,7 +266,7 @@ def drawBoard(board):
     # draw the individual boxes on the board
     for x in range(BOARDWIDTH):
         for y in range(BOARDHEIGHT):
-            drawBox(x, y, board[x][y])
+            drawBox(x, y, board.get(x,y))
 
 
 def drawStatus(score, level):
