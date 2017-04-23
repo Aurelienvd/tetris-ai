@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
 from board import *
+import time
 
 KEYS = (K_RIGHT, K_LEFT, K_UP)
 
@@ -15,20 +16,21 @@ class TetrisAgent():
 		self.board = board
 		self.score = 0
 
-	def best(self, piece, nextPiece, checkForNextPiece=False):
+	def best(self, piece, nextPiece, checkForNextPiece=False, board=None):
 		
 		best = None
 		bestScore = None
+		board = (self.board if board == None else board)
 		
 		for i in range(4):
 			workingPiece = (piece.clone() if not checkForNextPiece else nextPiece.clone())
 			workingPiece.rotate((workingPiece.get_rotation() + i) % len(PIECES[workingPiece.get_shape()]))
 
-			while (self.board.isValidPosition(workingPiece, -1)):
+			while (board.isValidPosition(workingPiece, -1)):
 				workingPiece.move_left()
 			
-			while (self.board.isValidPosition(workingPiece)):
-				workingBoard = self.board.clone()
+			while (board.isValidPosition(workingPiece)):
+				workingBoard = board.clone()
 				workingPiece.set_y(0)
 				workingBoard.fallDown(workingPiece)
 				workingBoard.addToBoard(workingPiece)
@@ -40,10 +42,10 @@ class TetrisAgent():
 				if(checkForNextPiece):
 					self.score = a*workingBoard.computeAggregate() + b*completedLines + c*workingBoard.computeHoles() + d*workingBoard.computeBumpiness()
 				else:
-					self.score = self.best(piece, nextPiece, True)
+					self.best(piece, nextPiece, True, workingBoard)
 
 				if(bestScore == None or self.score > bestScore):
-					self.bestScore = self.score
+					bestScore = self.score
 					best = workingPiece.clone()
 
 				workingPiece.move_right()
