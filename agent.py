@@ -15,40 +15,36 @@ class TetrisAgent():
 		self.board = board
 
 	def best(self, piece, nextPiece):
-		# dummy behavior just to check if it works properly.
-		
 		best = None
 		bestScore = None
-		workingPiece = piece.clone()
-		
-		
-		for i in range(4):
-			workingPiece.rotate((workingPiece.get_rotation() + 1) % len(PIECES[workingPiece.get_shape()]))
-			
-			workingBoard = self.board.clone()
 
-			while (workingBoard.isValidPosition(workingPiece, -1)):
+		for i in range(4):
+			workingPiece = piece.clone()
+			workingPiece.rotate((workingPiece.get_rotation() + i) % len(PIECES[workingPiece.get_shape()]))
+			
+			while (self.board.isValidPosition(workingPiece, -1)):
 				workingPiece.move_left(1)
 			
-			while (workingBoard.isValidPosition(workingPiece, 1)):
-
+			while (self.board.isValidPosition(workingPiece)):
+				workingBoard = self.board.clone()
 				workingBoard.fallDown(workingPiece)
+				workingBoard.addToBoard(workingPiece)
 
 				score = 0
 				completedLines = workingBoard.removeCompleteLines()
 				workingBoard.refreshColHeights(completedLines)
 
 				score = a*workingBoard.computeAggregate() + b*completedLines + c*workingBoard.computeHoles() + d*workingBoard.computeBumpiness()
-
 				if(bestScore == None or score > bestScore):
 					bestScore = score
 					best = workingPiece.clone()
-
 				workingPiece.move_right(1)
-		if(best != None):
-			best.set_y(0)
 
+		if best != None:
+			best.set_y(0)
 		return (best.clone() if best != None else piece)
+
 		
+
 
 		

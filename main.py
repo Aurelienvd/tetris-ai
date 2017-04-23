@@ -8,7 +8,7 @@ from pygame.locals import *
 from agent import *
 from board import *
 
-FPS = 25
+FPS = 60
 WINDOWWIDTH = 920
 WINDOWHEIGHT = 780
 BOXSIZE = 38
@@ -48,18 +48,40 @@ def runGame():
 	movingRight = False
 	score = 0
 	level, fallFreq = calculateLevelAndFallFreq(score)
-	
+
+	fallingPiece = board.getNewPiece()
+	nextPiece = board.getNewPiece()
+	fallingPiece = agent.best(fallingPiece, nextPiece)
+
 	while True: # game loop
-		fallingPiece = board.getNewPiece()
-		nextPiece = board.getNewPiece()
-			
-		if not board.isValidPosition(fallingPiece):
-			return # can't fit a new piece on the board, so game over
+		if fallingPiece == None:
+			# No falling piece in play, so start a new piece at the top
+			fallingPiece = nextPiece
+			nextPiece = board.getNewPiece()
+			lastFallTime = time.time() # reset lastFallTime
+			fallingPiece = agent.best(fallingPiece, nextPiece)
+			if not board.isValidPosition(fallingPiece):
+				return # can't fit a new piece on the board, so game over
 
 		checkForQuit()
-		fallingPiece = agent.best(fallingPiece, nextPiece)
-		board.fallDown(fallingPiece)
-		board.addToBoard(fallingPiece)
+		
+
+		# let the piece fall if it is time to fall
+		if time.time() - lastFallTime > 0.01:#fallFreq:
+			# see if the piece has landed
+			if not board.isValidPosition(fallingPiece, adjY=1):
+				# falling piece has landed, set it on the board
+				board.addToBoard(fallingPiece)
+				completeLines = board.removeCompleteLines()
+				if completeLines != 0:
+					board.refreshColHeights(completeLines)
+				score += completeLines
+				level, fallFreq = calculateLevelAndFallFreq(score)
+				fallingPiece = None
+			else:
+				# piece did not land, just move the piece down
+				fallingPiece.move_down()
+				lastFallTime = time.time()
 
 		# drawing everything on the screen
 		DISPLAYSURF.fill(BGCOLOR)
