@@ -35,3 +35,6 @@ class Piece:
 	def move_down(self, delta=1):
 		self.y = self.y + delta
 
+	def clone(self):
+		return Piece(self.shape, self.rotation, self.x, self.y, self.color)
+

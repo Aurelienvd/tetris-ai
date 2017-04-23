@@ -139,10 +139,12 @@ PIECES = {'S': S_SHAPE_TEMPLATE,
 
 class Board():
 
-	def __init__(self):
-		self.board = []
-		for i in range(BOARDWIDTH):
-			self.board.append([BLANK] * BOARDHEIGHT)
+	def __init__(self, oboard = None):
+		self.board = [[BLANK]*BOARDHEIGHT for i in range(BOARDWIDTH)]
+		if (oboard != None):
+			for i in range(BOARDWIDTH):
+				for j in range(BOARDHEIGHT):
+					self.board[i][j] = oboard[i][j]
 
 	def get(self,x,y):
 		return self.board[x][y]
@@ -234,3 +236,6 @@ class Board():
 				colHeights[i] = 0 
 			else:
 				colHeights[i] = res
+
+	def clone(self):
+		return Board(self)
