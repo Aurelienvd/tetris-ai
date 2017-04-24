@@ -20,7 +20,7 @@ XMARGIN = int((WINDOWWIDTH - BOARDWIDTH * BOXSIZE) / 2)
 TOPMARGIN = WINDOWHEIGHT - (BOARDHEIGHT * BOXSIZE) - 5
 
 
-assert len(COLORS) == len(LIGHTCOLORS) # each color must have light color
+#assert len(COLORS) == len(LIGHTCOLORS) # each color must have light color
 
 
 def main():
@@ -49,21 +49,37 @@ def runGame():
 	score = 0
 	level, fallFreq = calculateLevelAndFallFreq(score)
 	fallingPiece = board.getNewPiece()
-	
+	nextPiece = board.getNewPiece()
+	fallingPiece = agent.best(fallingPiece, nextPiece)[0]
+
 	while True: # game loop
-		nextPiece = board.getNewPiece()
-			
-		if not board.isValidPosition(fallingPiece):
-			return # can't fit a new piece on the board, so game over
+		if fallingPiece == None:
+			# No falling piece in play, so start a new piece at the top
+			fallingPiece = nextPiece
+			nextPiece = board.getNewPiece()
+			lastFallTime = time.time() # reset lastFallTime
+			fallingPiece = agent.best(fallingPiece, nextPiece)[0]	
+			if not board.isValidPosition(fallingPiece):
+				return # can't fit a new piece on the board, so game over
 
 		checkForQuit()
-		fallingPiece = agent.best(fallingPiece, nextPiece)
-		board.fallDown(fallingPiece)
-		board.addToBoard(fallingPiece)
-		completeLines = board.removeCompleteLines()
-		if completeLines != 0:
-			board.refreshColHeights(completeLines)
-		score += completeLines
+		# let the piece fall if it is time to fall
+		if time.time() - lastFallTime > 0.1:
+			# see if the piece has landed
+			if not board.isValidPosition(fallingPiece, adjY=1):
+				# falling piece has landed, set it on the board
+				board.addToBoard(fallingPiece)
+				completeLines = board.removeCompleteLines()
+				if completeLines != 0:
+					board.refreshColHeights(completeLines)
+				score += completeLines
+				level, fallFreq = calculateLevelAndFallFreq(score)
+				fallingPiece = None
+			else:
+				# piece did not land, just move the piece down
+				fallingPiece.move_down()
+				lastFallTime = time.time()
+
 
 		# drawing everything on the screen
 		DISPLAYSURF.fill(BGCOLOR)
@@ -74,9 +90,9 @@ def runGame():
 			drawPiece(fallingPiece)
 
 		pygame.display.update()
-		time.sleep(0.1)
+		#time.sleep(0.1)
 		FPSCLOCK.tick(FPS)
-		fallingPiece = nextPiece
+		#fallingPiece = nextPiece
 
 def makeTextObjs(text, font, color):
 	surf = font.render(text, True, color)

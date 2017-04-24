@@ -14,7 +14,6 @@ class TetrisAgent():
 
 	def __init__(self, board):
 		self.board = board
-		self.score = 0
 
 	def best(self, piece, nextPiece, checkForNextPiece=False, board=None):
 		
@@ -35,24 +34,23 @@ class TetrisAgent():
 				workingBoard.fallDown(workingPiece)
 				workingBoard.addToBoard(workingPiece)
 
-				self.score = 0
+				score = 0
 
 				if(checkForNextPiece):
-					self.score = a*workingBoard.computeAggregate() + b*workingBoard.completeLines() + c*workingBoard.computeHoles() + d*workingBoard.computeBumpiness()
+					score = a*workingBoard.computeAggregate() + b*workingBoard.completeLines() + c*workingBoard.computeHoles() + d*workingBoard.computeBumpiness()
 				else:
-					self.best(piece, nextPiece, True, workingBoard)
-					self.score += a*workingBoard.computeAggregate() + b*workingBoard.completeLines() + c*workingBoard.computeHoles() + d*workingBoard.computeBumpiness()
-
-				if(bestScore == None or self.score > bestScore):
-					bestScore = self.score
+					score = self.best(piece, nextPiece, True, workingBoard)[1]
+					#self.score += a*workingBoard.computeAggregate() + b*workingBoard.completeLines() + c*workingBoard.computeHoles() + d*workingBoard.computeBumpiness()
+				if(bestScore == None or score > bestScore):
+					bestScore = score
 					best = workingPiece.clone()
-
 				workingPiece.move_right()
+				
 		if(best != None):
 			best.set_y(0)
-		self.score = (bestScore if best != None else 0)
+		score = (bestScore if best != None else 0)
 
-		return (best.clone() if best != None else piece)
+		return [(best.clone() if best != None else piece),score]
 		
 
 		

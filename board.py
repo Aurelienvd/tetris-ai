@@ -7,25 +7,31 @@ TEMPLATEWIDTH = 5
 TEMPLATEHEIGHT = 5
 BLANK = '.'
 
-#               R    G    B
-WHITE       = (255, 255, 255)
-GRAY        = (185, 185, 185)
-BLACK       = (  0,   0,   0)
-RED         = (155,   0,   0)
-LIGHTRED    = (175,  20,  20)
-GREEN       = (  0, 155,   0)
+#			   R	G	B
+WHITE	   = (255, 255, 255)
+GRAY		= (185, 185, 185)
+BLACK	   = (  0,   0,   0)
+RED		 = (155,   0,   0)
+LIGHTRED	= (175,  20,  20)
+GREEN	   = (  0, 155,   0)
 LIGHTGREEN  = ( 20, 175,  20)
-BLUE        = (  0,   0, 155)
+BLUE		= (  0,   0, 155)
 LIGHTBLUE   = ( 20,  20, 175)
-YELLOW      = (155, 155,   0)
+YELLOW	  = (155, 155,   0)
 LIGHTYELLOW = (175, 175,  20)
+CYAN 		= (0, 255, 255)
+LIGHTCYAN = (20,225,225)
+ORANGE 		= (255, 128, 0)
+LIGHTORANGE = (225,150,20)
+PURPLE 		= (153, 0, 153)
+LIGHTPURPLE = (175,20,175)
 
 BORDERCOLOR = BLUE
 BGCOLOR = BLACK
 TEXTCOLOR = WHITE
 TEXTSHADOWCOLOR = GRAY
-COLORS      = (     BLUE,      GREEN,      RED,      YELLOW)
-LIGHTCOLORS = (LIGHTBLUE, LIGHTGREEN, LIGHTRED, LIGHTYELLOW)
+COLORS	  = (BLUE, GREEN, RED, YELLOW, CYAN, ORANGE, PURPLE)
+LIGHTCOLORS = (LIGHTBLUE, LIGHTGREEN, LIGHTRED, LIGHTYELLOW, LIGHTCYAN, LIGHTORANGE, LIGHTPURPLE)
 
 S_SHAPE_TEMPLATE = [['.....',
 					 '.....',
@@ -137,6 +143,14 @@ PIECES = {'S': S_SHAPE_TEMPLATE,
 		  'O': O_SHAPE_TEMPLATE,
 		  'T': T_SHAPE_TEMPLATE}
 
+COLORS_dict = {'S': 1,
+		  'Z': 2,
+		  'J': 0,
+		  'L': 5,
+		  'I': 4,
+		  'O': 3,
+		  'T': 6}
+
 class Board():
 
 	def __init__(self, oboard = None):
@@ -145,7 +159,10 @@ class Board():
 		if (oboard != None):
 			for i in range(BOARDWIDTH):
 				for j in range(BOARDHEIGHT):
-					self.board[i][j] = oboard.get(i, j)
+					self.board[i][j] = oboard.get(i,j)
+			for i in range(len(oboard.colHeights)):
+				self.colHeights[i] = oboard.colHeights[i] 
+
 
 	def get(self,x,y):
 		return self.board[x][y]
@@ -169,7 +186,7 @@ class Board():
 	def getNewPiece(self):
 		# return a random new piece in a random rotation and color
 		shape = random.choice(list(PIECES.keys()))
-		newPiece = Piece(shape, 0, int(BOARDWIDTH/2)-int(TEMPLATEWIDTH/2), 0, random.randint(0, len(COLORS)-1))
+		newPiece = Piece(shape, 0, int(BOARDWIDTH/2)-int(TEMPLATEWIDTH/2), 0, COLORS_dict.get(shape))#COLORS.get(shape))
 		return newPiece
 
 	def isValidPosition(self, piece, adjX=0, adjY=0):
