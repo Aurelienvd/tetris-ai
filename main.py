@@ -58,7 +58,12 @@ def runGame():
 			fallingPiece = nextPiece
 			nextPiece = board.getNewPiece()
 			lastFallTime = time.time() # reset lastFallTime
+
+			startBest = time.time()
 			fallingPiece = agent.best(fallingPiece, nextPiece, False, board)[0]	
+			endBest = time.time()
+			print("Time: "+str(endBest-startBest))
+
 			if not board.isValidPosition(fallingPiece):
 				return # can't fit a new piece on the board, so game over
 

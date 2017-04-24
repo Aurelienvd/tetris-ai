@@ -10,6 +10,14 @@ b = 0.760666
 c = -0.35663
 d = -0.184483
 
+ROT = { 'S': 2,
+		'Z': 2,
+		'J': 4,
+		'L': 4,
+		'I': 2,
+		'O': 1,
+		'T': 4}
+
 class TetrisAgent():
 
 	def __init__(self, board):
@@ -19,8 +27,10 @@ class TetrisAgent():
 		
 		best = None
 		bestScore = None
-		
-		for i in range(4):
+
+		nbRot = ROT.get(piece.shape) if not checkForNextPiece else ROT.get(nextPiece.shape)
+
+		for i in range(nbRot):
 			workingPiece = (piece.clone() if not checkForNextPiece else nextPiece.clone())
 			workingPiece.rotate((workingPiece.get_rotation() + i) % len(PIECES[workingPiece.get_shape()]))
 
