@@ -57,7 +57,7 @@ def runGame():
 			return # can't fit a new piece on the board, so game over
 
 		checkForQuit()
-		fallingPiece = agent.best(fallingPiece, nextPiece)
+		fallingPiece = agent.best(fallingPiece, nextPiece, False, board)[0]
 		board.fallDown(fallingPiece)
 		board.addToBoard(fallingPiece)
 		completeLines = board.removeCompleteLines()
@@ -74,7 +74,7 @@ def runGame():
 			drawPiece(fallingPiece)
 
 		pygame.display.update()
-		time.sleep(0.1)
+		time.sleep(0.5)
 		FPSCLOCK.tick(FPS)
 		fallingPiece = nextPiece
 

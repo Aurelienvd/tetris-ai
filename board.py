@@ -146,6 +146,7 @@ class Board():
 			for i in range(BOARDWIDTH):
 				for j in range(BOARDHEIGHT):
 					self.board[i][j] = oboard.get(i, j)
+				self.colHeights[i] = oboard.colHeights[i]
 
 	def get(self,x,y):
 		return self.board[x][y]
