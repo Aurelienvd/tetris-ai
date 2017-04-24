@@ -77,7 +77,6 @@ def runGame():
 				completeLines = board.removeCompleteLines()
 				if completeLines != 0:
 					board.refreshColHeights(completeLines)
-				print(board.computeHoles())
 				score += completeLines
 				level, fallFreq = calculateLevelAndFallFreq(score)
 				fallingPiece = None
