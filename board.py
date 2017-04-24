@@ -169,7 +169,7 @@ class Board():
 	def getNewPiece(self):
 		# return a random new piece in a random rotation and color
 		shape = random.choice(list(PIECES.keys()))
-		newPiece = Piece(shape, random.randint(0, len(PIECES[shape])-1), int(BOARDWIDTH/2)-int(TEMPLATEWIDTH/2), 0, random.randint(0, len(COLORS)-1))
+		newPiece = Piece(shape, 0, int(BOARDWIDTH/2)-int(TEMPLATEWIDTH/2), 0, random.randint(0, len(COLORS)-1))
 		return newPiece
 
 	def isValidPosition(self, piece, adjX=0, adjY=0):
@@ -215,13 +215,14 @@ class Board():
 
 	def computeHoles(self):
 		L = 0
-		for x in range(BOARDWIDTH):
-			for y in range(BOARDHEIGHT):
-				if self.board[x][y] == BLANK:
-					for yAbove in self.board[x][:y]:
-						if yAbove != BLANK:
-							L += 1
-							break
+		for y in range(BOARDHEIGHT):
+			block = False
+			for x in range(BOARDWIDTH):
+				if(self.board[x][y] == BLANK):
+					block = True
+				elif (self.board[x][y] == BLANK and block):
+					L = L + 1
+
 		return L
 
 	def computeBumpiness(self):
@@ -232,6 +233,13 @@ class Board():
 
 	def computeAggregate(self):
 		return sum(self.colHeights)
+
+	def completeLines(self):
+		count = 0
+		for x in range(BOARDWIDTH):
+			if(self.isCompleteLine(x)):
+				count = count + 1
+		return count
 
 	def refreshColHeights(self, completeLines):
 		for i in range(len(self.colHeights)):

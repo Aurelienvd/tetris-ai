@@ -36,13 +36,12 @@ class TetrisAgent():
 				workingBoard.addToBoard(workingPiece)
 
 				self.score = 0
-				completedLines = workingBoard.removeCompleteLines()
-				workingBoard.refreshColHeights(completedLines)
 
 				if(checkForNextPiece):
-					self.score = a*workingBoard.computeAggregate() + b*completedLines + c*workingBoard.computeHoles() + d*workingBoard.computeBumpiness()
+					self.score = a*workingBoard.computeAggregate() + b*workingBoard.completeLines() + c*workingBoard.computeHoles() + d*workingBoard.computeBumpiness()
 				else:
 					self.best(piece, nextPiece, True, workingBoard)
+					self.score += a*workingBoard.computeAggregate() + b*workingBoard.completeLines() + c*workingBoard.computeHoles() + d*workingBoard.computeBumpiness()
 
 				if(bestScore == None or self.score > bestScore):
 					bestScore = self.score
