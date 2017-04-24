@@ -8,7 +8,7 @@ from pygame.locals import *
 from agent import *
 from board import *
 
-FPS = 25
+FPS = 60
 WINDOWWIDTH = 920
 WINDOWHEIGHT = 780
 BOXSIZE = 38
@@ -64,7 +64,7 @@ def runGame():
 
 		checkForQuit()
 		# let the piece fall if it is time to fall
-		if time.time() - lastFallTime > 0.1:
+		if time.time() - lastFallTime > 0.01:
 			# see if the piece has landed
 			if not board.isValidPosition(fallingPiece, adjY=1):
 				# falling piece has landed, set it on the board
