@@ -228,12 +228,13 @@ class Board():
 				y -= 1 # move on to check next row up
 		return numLinesRemoved
 
+	
 	def computeHoles(self):
 		L = 0
-		for y in range(BOARDHEIGHT):
+		for x in range(BOARDWIDTH):
 			block = False
-			for x in range(BOARDWIDTH):
-				if(self.board[x][y] == BLANK):
+			for y in range(BOARDHEIGHT):
+				if(self.board[x][y] != BLANK):
 					block = True
 				elif (self.board[x][y] == BLANK and block):
 					L = L + 1

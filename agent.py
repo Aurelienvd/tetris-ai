@@ -44,7 +44,7 @@ class TetrisAgent():
 				workingBoard.addToBoard(pieceSet)
 
 				score = 0
-
+				
 				if(checkForNextPiece):
 					score = a*workingBoard.computeAggregate() + b*workingBoard.completeLines() + c*workingBoard.computeHoles() + d*workingBoard.computeBumpiness()
 				else:
