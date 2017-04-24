@@ -50,7 +50,7 @@ def runGame():
 	level, fallFreq = calculateLevelAndFallFreq(score)
 	fallingPiece = board.getNewPiece()
 	nextPiece = board.getNewPiece()
-	fallingPiece = agent.best(fallingPiece, nextPiece)[0]
+	fallingPiece = agent.best(fallingPiece, nextPiece, False, board)[0]
 
 	while True: # game loop
 		if fallingPiece == None:
@@ -58,7 +58,7 @@ def runGame():
 			fallingPiece = nextPiece
 			nextPiece = board.getNewPiece()
 			lastFallTime = time.time() # reset lastFallTime
-			fallingPiece = agent.best(fallingPiece, nextPiece)[0]	
+			fallingPiece = agent.best(fallingPiece, nextPiece, False, board)[0]	
 			if not board.isValidPosition(fallingPiece):
 				return # can't fit a new piece on the board, so game over
 
@@ -80,7 +80,6 @@ def runGame():
 				fallingPiece.move_down()
 				lastFallTime = time.time()
 
-
 		# drawing everything on the screen
 		DISPLAYSURF.fill(BGCOLOR)
 		drawBoard(board)
@@ -90,9 +89,7 @@ def runGame():
 			drawPiece(fallingPiece)
 
 		pygame.display.update()
-		#time.sleep(0.1)
 		FPSCLOCK.tick(FPS)
-		#fallingPiece = nextPiece
 
 def makeTextObjs(text, font, color):
 	surf = font.render(text, True, color)
