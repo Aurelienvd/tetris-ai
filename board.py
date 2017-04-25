@@ -143,6 +143,8 @@ PIECES = {'S': S_SHAPE_TEMPLATE,
 		  'O': O_SHAPE_TEMPLATE,
 		  'T': T_SHAPE_TEMPLATE}
 
+PIECE_KEYS = ['S', 'Z', 'J', 'L', 'I', 'O', 'T']
+
 COLORS_dict = {'S': 1,
 		  'Z': 2,
 		  'J': 0,
@@ -183,7 +185,7 @@ class Board():
 
 	def getNewPiece(self):
 		# return a random new piece in a random rotation and color
-		shape = random.choice(list(PIECES.keys()))
+		shape = random.choice(PIECE_KEYS)
 		newPiece = Piece(shape, 0, int(BOARDWIDTH/2)-int(TEMPLATEWIDTH/2), 0, COLORS_dict.get(shape))#COLORS.get(shape))
 		return newPiece
 
@@ -191,8 +193,7 @@ class Board():
 		# Return True if the piece is within the board and not colliding
 		for x in range(TEMPLATEWIDTH):
 			for y in range(TEMPLATEHEIGHT):
-				isAboveBoard = y + piece.get_y() + adjY < 0
-				if isAboveBoard or PIECES[piece.get_shape()][piece.get_rotation()][y][x] == BLANK:
+				if PIECES[piece.get_shape()][piece.get_rotation()][y][x] == BLANK:
 					continue
 				if not self.isOnBoard(x + piece.get_x() + adjX, y + piece.get_y() + adjY):
 					return False
@@ -227,6 +228,9 @@ class Board():
 			else:
 				y -= 1 # move on to check next row up
 		return numLinesRemoved
+
+	def setSeed(self, seed):
+		random.seed(seed)
 
 	
 	def computeHoles(self):

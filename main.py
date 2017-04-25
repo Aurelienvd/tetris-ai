@@ -32,13 +32,13 @@ def main():
 	BIGFONT = pygame.font.Font('freesansbold.ttf', 100)
 	pygame.display.set_caption('Tetromino')
 	while True: # game loop
-		
 		runGame()
 		
 
 def runGame():
 	# setup variables for the start of the game
 	board = Board()
+	board.setSeed(14)
 	agent = TetrisAgent(board)
 	lastMoveDownTime = time.time()
 	lastMoveSidewaysTime = time.time()
@@ -59,13 +59,10 @@ def runGame():
 			nextPiece = board.getNewPiece()
 			lastFallTime = time.time() # reset lastFallTime
 
-			startBest = time.time()
 			fallingPiece = agent.best(fallingPiece, nextPiece, False, board)[0]	
-			endBest = time.time()
-			print("Time: "+str(endBest-startBest))
 
 			if not board.isValidPosition(fallingPiece):
-				return # can't fit a new piece on the board, so game over
+				break # can't fit a new piece on the board, so game over
 
 		checkForQuit()
 		# let the piece fall if it is time to fall
