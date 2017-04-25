@@ -256,8 +256,8 @@ class Board():
 
 	def completeLines(self):
 		count = 0
-		for x in range(BOARDWIDTH):
-			if(self.isCompleteLine(x)):
+		for y in range(BOARDHEIGHT):
+			if(self.isCompleteLine(y)):
 				count = count + 1
 		return count
 

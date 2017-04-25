@@ -38,7 +38,6 @@ def main():
 def runGame():
 	# setup variables for the start of the game
 	board = Board()
-	board.setSeed(14)
 	agent = TetrisAgent(board)
 	lastMoveDownTime = time.time()
 	lastMoveSidewaysTime = time.time()
