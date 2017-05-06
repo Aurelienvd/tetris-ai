@@ -46,7 +46,7 @@ class Individual():
 		return self.fitness
 
 	def __str__(self):
-		string = ",".join([str(x) for x in self.getParams()]) + "\n"
+		string = ",".join([str(x) for x in self.getParams()]) + "," + str(self.fitness) + "\n"
 		return string
 
 	@staticmethod
@@ -64,7 +64,7 @@ class Individual():
 		individuals = [(i.strip()).split(",") for i in individuals]
 		for i in range(len(individuals)):
 			params = individuals[i]
-			individuals[i] = Individual(params[0], params[1], params[2], params[3])
+			individuals[i] = Individual(params[0], params[1], params[2], params[3], params[4])
 		return individuals
 
 

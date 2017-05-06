@@ -3,6 +3,7 @@ from operator import attrgetter
 from pygame.locals import *
 from board import *
 from individual import *
+from multiprocessing import Queue, Process
 
 KEYS = (K_RIGHT, K_LEFT, K_UP)
 
@@ -14,15 +15,19 @@ ROT = { 'S': 2,
 		'O': 1,
 		'T': 4}
 
+N_PROC = 4
+
 W_LB = -1
 W_UB = 1
-N_GAMES = 10
-N_MOVES = 250
+N_GAMES = 8
+N_MOVES = 200
 N_GEN = 30
 POPULATION_SIZE = 100
 TOURNAMENT_SIZE = POPULATION_SIZE//10
-OFFSPRING_SIZE = int(POPULATION_SIZE*0.3)
+OFFSPRING_SIZE = int(POPULATION_SIZE*0.28)
 MUTATION_RATE = 0.05
+
+CHUNK_SIZE = POPULATION_SIZE//N_PROC		# precond: POPULATION_SIZE must be divisible by N_PROC
 
 
 class TetrisAgent():
@@ -85,12 +90,14 @@ class TetrisAgent():
 		########## Evolution Algorithm ##########
 
 	def train(self):
+
 		self.population = []
 		for i in range(POPULATION_SIZE):
 			self.population.append(self.generateRandomIndividual())
-
-		self.computeFitness(N_GAMES, N_MOVES, self.population)
-
+		
+		self.distributedFitness(self.population, POPULATION_SIZE)
+		print("Fitness Done")
+		gen = 1
 		for i in range(N_GEN):
 			offsprings = [None]*OFFSPRING_SIZE
 			for i in range(OFFSPRING_SIZE):
@@ -98,24 +105,45 @@ class TetrisAgent():
 				offspring = self.onePointCrossOver(parents[0], parents[1])
 				self.mutate(offspring)
 				offsprings[i] = offspring
+			self.distributedFitness(offsprings, OFFSPRING_SIZE)
 			self.nextGeneration(offsprings)
-			self.computeFitness(N_GAMES, N_MOVES, offsprings)
+			print("Gen {0} Done".format(gen))
+			gen = gen + 1
+
+		Individual.write(self.population)
 
 	def generateRandomIndividual(self):
 		individual = Individual(random.uniform(W_LB, W_UB), random.uniform(W_LB, W_UB), random.uniform(W_LB, W_UB), random.uniform(W_LB, W_UB), 0)
 		return individual
 
-	def computeFitness(self, nbGames, maxNbPieces, population):
+	def distributedFitness(self, population, population_size):
+		assert population_size%N_PROC == 0 
+		q = Queue()
+
+		jobs = []
+		for i in range(N_PROC):
+			p = Process(target=self.computeFitness, args=(population[i*CHUNK_SIZE:(i+1)*CHUNK_SIZE], q))
+			jobs.append(p)
+			p.start()
+
+		for i in range(N_PROC):
+			population[i*CHUNK_SIZE:(i+1)*CHUNK_SIZE] = q.get(True)
+
+		for j in jobs:
+			j.join()
+
+
+	def computeFitness(self, population, q = None):
 		for individual in population:
 			self.setParams(individual.getParams())
 			totalScore = 0
-			for i in range(nbGames):
+			for i in range(N_GAMES):
 				self.board = Board()
 				fallingPiece = self.board.getNewPiece()
 				nextPiece = self.board.getNewPiece()
 				score = 0
 				currNbPieces = 0
-				while(currNbPieces <= maxNbPieces and self.board.isValidPosition(fallingPiece)):
+				while(currNbPieces <= N_MOVES and self.board.isValidPosition(fallingPiece)):
 					fallingPiece = self.best(fallingPiece, nextPiece, False, self.board)[0]
 					self.board.fallDown(fallingPiece)
 					self.board.addToBoard(fallingPiece)
@@ -124,7 +152,9 @@ class TetrisAgent():
 					fallingPiece = nextPiece
 					nextPiece = self.board.getNewPiece()
 				totalScore += score
-			individual.setFitness(totalScore//nbGames)
+			individual.setFitness(totalScore//N_GAMES)
+		if (q != None):
+			q.put(population)
 
 	def randomSubset(self, iterator, K):
 		result = []
