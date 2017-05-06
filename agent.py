@@ -96,6 +96,7 @@ class TetrisAgent():
 					fallingPiece = this.best(fallingPiece, nextPiece, False, self.board)[0]
 					self.board.fallDown(fallingPiece)
 					self.board.addToBoard(fallingPiece)
+					currNbPieces += 1
 					score += self.board.removeCompleteLines()
 					fallingPiece = nextPiece
 					nextPiece = self.board.getNewPiece()
