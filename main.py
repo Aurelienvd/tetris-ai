@@ -19,10 +19,7 @@ MOVEDOWNFREQ = 0.1
 XMARGIN = int((WINDOWWIDTH - BOARDWIDTH * BOXSIZE) / 2)
 TOPMARGIN = WINDOWHEIGHT - (BOARDHEIGHT * BOXSIZE) - 5
 
-aggregateParam = -0.510066
-compLinesParam = 0.760666
-holesParam = -0.35663
-bumpParam = -0.184483
+IA_PARAMS = [-0.510066, 0.760666, -0.35663, -0.184483]
 
 
 #assert len(COLORS) == len(LIGHTCOLORS) # each color must have light color
@@ -43,7 +40,7 @@ def main():
 			runGame()
 	elif(sys.argv[1] == "-t"):
 		agent = TetrisAgent(Board())
-		agent.setParams(0,0,0,0)
+		agent.setParams([0,0,0,0])
 		agent.train()
 		
 
@@ -51,7 +48,7 @@ def runGame():
 	# setup variables for the start of the game
 	board = Board()
 	agent = TetrisAgent(board)
-	agent.setParams(aggregateParam, compLinesParam, holesParam, bumpParam)
+	agent.setParams(IA_PARAMS)
 	lastMoveDownTime = time.time()
 	lastMoveSidewaysTime = time.time()
 	lastFallTime = time.time()

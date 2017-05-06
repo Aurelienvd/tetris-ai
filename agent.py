@@ -1,6 +1,7 @@
 import pygame, time, random
 from pygame.locals import *
 from board import *
+from individual import *
 
 KEYS = (K_RIGHT, K_LEFT, K_UP)
 
@@ -17,11 +18,11 @@ class TetrisAgent():
 	def __init__(self, board):
 		self.board = board
 
-	def setParams(self, aggregateParam, compLinesParam, holesParam, bumpParam):
-		self.setAggregateParam(aggregateParam)
-		self.setCompLinesParam(compLinesParam)
-		self.setHolesParam(holesParam)
-		self.setBumpParam(bumpParam)
+	def setParams(self, paramList):
+		self.setAggregateParam(paramList[0])
+		self.setCompLinesParam(paramList[1])
+		self.setHolesParam(paramList[2])
+		self.setBumpParam(paramList[3])
 
 	def setAggregateParam(self,aggregateParam):
 		self.aggregateParam = aggregateParam
@@ -76,20 +77,15 @@ class TetrisAgent():
 
 	def train(self):
 		individual = self.generateRandomIndividual()
-		print(individual[aggregateParam])
 
 	def generateRandomIndividual(self):
-		individual = {aggregateParam : random.uniform(-0.5, 0.5),
-		compLinesParam : random.uniform(-0.5, 0.5),
-		holesParam : random.uniform(-0.5, 0.5),
-		bumpParam : random.uniform(-0.5, 0.5),
-		fitness : 0}
+		individual = Individual(random.uniform(-0.5, 0.5), random.uniform(-0.5, 0.5), random.uniform(-0.5, 0.5), random.uniform(-0.5, 0.5), 0)
 		return individual
 
 	def computeFitness(self, population, nbGames, maxNbPieces):
 		for individual in population:
 			self.board = Board()
-			agent.setParams(individual[aggregateParam], individual[compLinesParam], individual[holesParam], individual[bumpParam])
+			agent.setParams(individual.getParams())
 			totalScore = 0
 			for i in nbGames:
 				fallingPiece = board.getNewPiece()
@@ -104,7 +100,7 @@ class TetrisAgent():
 					fallingPiece = nextPiece
 					nextPiece = self.board.getNewPiece()
 				totalScore += score
-			individual[fitness] = totalScore
+			individual.setFitness(totalScore)
 
 
 
