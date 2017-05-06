@@ -82,7 +82,6 @@ class TetrisAgent():
 		self.population = []
 		for i in range(self.populationSize):
 			self.population.append(self.generateRandomIndividual())
-		self.tournamentSelect(5)
 
 	def generateRandomIndividual(self):
 		individual = Individual(random.uniform(-0.5, 0.5), random.uniform(-0.5, 0.5), random.uniform(-0.5, 0.5), random.uniform(-0.5, 0.5), 0)
@@ -131,9 +130,15 @@ class TetrisAgent():
 		fittest2 = max(KRandomIndividuals, key=attrgetter('fitness'))
 		return (fittest1, fittest2)
 
-	def onePointCrossOver(indiv1, indiv2):
+	def onePointCrossOver(self, indiv1, indiv2):
 		index = random.randint(1, self.nbParams)
 		return indiv1[:index] + indiv2[index:]
+
+
+	def mutate(self, individual):
+		paramMutating = random.choice(["aggregateParam", "compLinesParam", "holesParam", "bumpParam"])
+		paramValue = getattr(individual, paramMutating)
+		setattr(individual, paramMutating, paramValue * random.gauss(1, 0.2))
 
 
 

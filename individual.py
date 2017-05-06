@@ -3,7 +3,7 @@ class Individual():
 		self.setParams(aggregateParam, compLinesParam, holesParam, bumpParam, fitness)
 
 	def __repr__(self):
-		return self.getFitness().__repr__()
+		return self.getParams().__repr__()
 
 	def setParams(self, aggregateParam, compLinesParam, holesParam, bumpParam, fitness):
 		self.setAggregateParam(aggregateParam)
