@@ -99,7 +99,7 @@ class TetrisAgent():
 				nextPiece = self.board.getNewPiece()
 				score = 0
 				currNbPieces = 0
-				while(currNbPieces <= maxNbPieces and not self.board.isValidPosition(fallingPiece)):
+				while(currNbPieces <= maxNbPieces and self.board.isValidPosition(fallingPiece)):
 					fallingPiece = self.best(fallingPiece, nextPiece, False, self.board)[0]
 					self.board.fallDown(fallingPiece)
 					self.board.addToBoard(fallingPiece)
@@ -108,6 +108,7 @@ class TetrisAgent():
 					fallingPiece = nextPiece
 					nextPiece = self.board.getNewPiece()
 				totalScore += score
+			print(totalScore)
 			individual.setFitness(totalScore)
 
 	def randomSubset(self, iterator, K):
