@@ -83,21 +83,23 @@ class TetrisAgent():
 		for i in range(self.populationSize):
 			self.population.append(self.generateRandomIndividual())
 
+		self.computeFitness(5, 200)
+
 	def generateRandomIndividual(self):
 		individual = Individual(random.uniform(-0.5, 0.5), random.uniform(-0.5, 0.5), random.uniform(-0.5, 0.5), random.uniform(-0.5, 0.5), 0)
 		return individual
 
-	def computeFitness(self, population, nbGames, maxNbPieces):
-		for individual in population:
-			self.board = Board()
-			agent.setParams(individual.getParams())
+	def computeFitness(self, nbGames, maxNbPieces):
+		for individual in self.population:
+			self.setParams(individual.getParams())
 			totalScore = 0
-			for i in nbGames:
-				fallingPiece = board.getNewPiece()
-				nextPiece = board.getNewPiece()
+			for i in range(nbGames):
+				self.board = Board()
+				fallingPiece = self.board.getNewPiece()
+				nextPiece = self.board.getNewPiece()
 				score = 0
 				currNbPieces = 0
-				while(currNbPieces <= maxNbPieces and not board.isValidPosition(fallingPiece)):
+				while(currNbPieces <= maxNbPieces and not self.board.isValidPosition(fallingPiece)):
 					fallingPiece = self.best(fallingPiece, nextPiece, False, self.board)[0]
 					self.board.fallDown(fallingPiece)
 					self.board.addToBoard(fallingPiece)
