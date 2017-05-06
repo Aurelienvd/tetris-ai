@@ -46,14 +46,14 @@ class Individual():
 		return self.fitness
 
 	def __str__(self):
-		string = ",".join(self.getParams()) + "\n"
+		string = ",".join([str(x) for x in self.getParams()]) + "\n"
 		return string
 
 	@staticmethod
 	def write(individuals, filename = "individuals.sv"):
 		with open(filename, "w") as f:
-			for individuals in individuals:
-				f.write(str(i))
+			for individual in individuals:
+				f.write(str(individual))
 
 
 	@staticmethod
