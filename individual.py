@@ -2,6 +2,9 @@ class Individual():
 	def __init__(self, aggregateParam, compLinesParam, holesParam, bumpParam, fitness):
 		self.setParams(aggregateParam, compLinesParam, holesParam, bumpParam, fitness)
 
+	def __repr__(self):
+		return self.getFitness().__repr__()
+
 	def setParams(self, aggregateParam, compLinesParam, holesParam, bumpParam, fitness):
 		self.setAggregateParam(aggregateParam)
 		self.setCompLinesParam(compLinesParam)

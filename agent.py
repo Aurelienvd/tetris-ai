@@ -1,4 +1,5 @@
 import pygame, time, random
+from operator import attrgetter
 from pygame.locals import *
 from board import *
 from individual import *
@@ -20,6 +21,7 @@ class TetrisAgent():
 		self.populationSize = 100
 
 	def setParams(self, paramList):
+		self.nbParams = len(paramList)
 		self.setAggregateParam(paramList[0])
 		self.setCompLinesParam(paramList[1])
 		self.setHolesParam(paramList[2])
@@ -80,6 +82,7 @@ class TetrisAgent():
 		self.population = []
 		for i in range(self.populationSize):
 			self.population.append(self.generateRandomIndividual())
+		self.tournamentSelect(5)
 
 	def generateRandomIndividual(self):
 		individual = Individual(random.uniform(-0.5, 0.5), random.uniform(-0.5, 0.5), random.uniform(-0.5, 0.5), random.uniform(-0.5, 0.5), 0)
@@ -96,7 +99,7 @@ class TetrisAgent():
 				score = 0
 				currNbPieces = 0
 				while(currNbPieces <= maxNbPieces and not board.isValidPosition(fallingPiece)):
-					fallingPiece = this.best(fallingPiece, nextPiece, False, self.board)[0]
+					fallingPiece = self.best(fallingPiece, nextPiece, False, self.board)[0]
 					self.board.fallDown(fallingPiece)
 					self.board.addToBoard(fallingPiece)
 					currNbPieces += 1
@@ -105,6 +108,33 @@ class TetrisAgent():
 					nextPiece = self.board.getNewPiece()
 				totalScore += score
 			individual.setFitness(totalScore)
+
+	def randomSubset(self, iterator, K):
+		result = []
+		N = 0
+
+		for item in iterator:
+			N += 1
+			if len( result ) < K:
+				result.append( item )
+			else:
+				s = int(random.random() * N)
+				if s < K:
+					result[ s ] = item
+
+		return result
+
+	def tournamentSelect(self, K):
+		KRandomIndividuals = self.randomSubset(self.population, K)
+		fittest1 = max(KRandomIndividuals, key=attrgetter('fitness'))
+		KRandomIndividuals.remove(fittest1)
+		fittest2 = max(KRandomIndividuals, key=attrgetter('fitness'))
+		return (fittest1, fittest2)
+
+	def onePointCrossOver(indiv1, indiv2):
+		index = random.randint(1, self.nbParams)
+		return indiv1[:index] + indiv2[index:]
+
 
 
 
