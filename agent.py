@@ -1,14 +1,8 @@
-import pygame
+import pygame, time, random
 from pygame.locals import *
 from board import *
-import time
 
 KEYS = (K_RIGHT, K_LEFT, K_UP)
-
-a = -0.510066
-b = 0.760666
-c = -0.35663
-d = -0.184483
 
 ROT = { 'S': 2,
 		'Z': 2,
@@ -22,6 +16,25 @@ class TetrisAgent():
 
 	def __init__(self, board):
 		self.board = board
+
+	def setParams(self, aggregateParam, compLinesParam, holesParam, bumpParam):
+		self.setAggregateParam(aggregateParam)
+		self.setCompLinesParam(compLinesParam)
+		self.setHolesParam(holesParam)
+		self.setBumpParam(bumpParam)
+
+	def setAggregateParam(self,aggregateParam):
+		self.aggregateParam = aggregateParam
+
+	def setCompLinesParam(self, compLinesParam):
+		self.compLinesParam = compLinesParam
+
+	def setHolesParam(self, holesParam):
+		self.holesParam = holesParam
+
+	def setBumpParam(self, bumpParam):
+		self.bumpParam = bumpParam
+
 
 	def best(self, piece, nextPiece, checkForNextPiece=False, board=None):
 		
@@ -46,7 +59,7 @@ class TetrisAgent():
 				score = 0
 				
 				if(checkForNextPiece):
-					score = a*workingBoard.computeAggregate() + b*workingBoard.completeLines() + c*workingBoard.computeHoles() + d*workingBoard.computeBumpiness()
+					score = self.aggregateParam*workingBoard.computeAggregate() + self.compLinesParam*workingBoard.completeLines() + self.holesParam*workingBoard.computeHoles() + self.bumpParam*workingBoard.computeBumpiness()
 				else:
 					score = self.best(piece, nextPiece, True, workingBoard)[1]
 
@@ -56,6 +69,34 @@ class TetrisAgent():
 				workingPiece.move_right()
 
 		return [(best.clone() if best != None else piece), bestScore]
+
+
+
+		########## Evolution Algorithm ##########
+
+	def train(self):
+		individual = self.generateRandomIndividual()
+		print(individual[aggregateParam])
+
+	def generateRandomIndividual(self):
+		individual = {aggregateParam : random.uniform(-0.5, 0.5),
+		compLinesParam : random.uniform(-0.5, 0.5),
+		holesParam : random.uniform(-0.5, 0.5),
+		bumpParam : random.uniform(-0.5, 0.5),
+		fitness : 0}
+		return individual
+
+	def computeFitness(self, population, nbGames):
+		for individual in population:
+			self.board = Board()
+			agent.setParams(individual[aggregateParam], individual[compLinesParam], individual[holesParam], individual[bumpParam])
+			totalScore = 0
+			for i in nbGames:
+				fallingPiece = board.getNewPiece()
+				nextPiece = board.getNewPiece()
+
+
+
 
 		
 

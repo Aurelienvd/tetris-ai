@@ -3,15 +3,15 @@
 # http://inventwithpython.com/pygame
 # Released under a "Simplified BSD" license
 
-import random, time, pygame, sys
+import sys
 from pygame.locals import *
 from agent import *
 from board import *
 
 FPS = 60
-WINDOWWIDTH = 920
-WINDOWHEIGHT = 780
-BOXSIZE = 38
+WINDOWWIDTH = 720
+WINDOWHEIGHT = 480
+BOXSIZE = 20
 
 MOVESIDEWAYSFREQ = 0.15
 MOVEDOWNFREQ = 0.1
@@ -19,26 +19,39 @@ MOVEDOWNFREQ = 0.1
 XMARGIN = int((WINDOWWIDTH - BOARDWIDTH * BOXSIZE) / 2)
 TOPMARGIN = WINDOWHEIGHT - (BOARDHEIGHT * BOXSIZE) - 5
 
+aggregateParam = -0.510066
+compLinesParam = 0.760666
+holesParam = -0.35663
+bumpParam = -0.184483
+
 
 #assert len(COLORS) == len(LIGHTCOLORS) # each color must have light color
 
 
 def main():
-	global FPSCLOCK, DISPLAYSURF, BASICFONT, BIGFONT
-	pygame.init()
-	FPSCLOCK = pygame.time.Clock()
-	DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
-	BASICFONT = pygame.font.Font('freesansbold.ttf', 18)
-	BIGFONT = pygame.font.Font('freesansbold.ttf', 100)
-	pygame.display.set_caption('Tetromino')
-	while True: # game loop
-		runGame()
+	if len(sys.argv) != 2:
+		print("Need at least one argument : \n-r for a normal run of the tetris game\n-t to run train the IA")
+	elif(sys.argv[1] == "-r"):
+		global FPSCLOCK, DISPLAYSURF, BASICFONT, BIGFONT
+		pygame.init()
+		FPSCLOCK = pygame.time.Clock()
+		DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
+		BASICFONT = pygame.font.Font('freesansbold.ttf', 18)
+		BIGFONT = pygame.font.Font('freesansbold.ttf', 100)
+		pygame.display.set_caption('Tetromino')
+		while True: # game loop
+			runGame()
+	elif(sys.argv[1] == "-t"):
+		agent = TetrisAgent(Board())
+		agent.setParams(0,0,0,0)
+		agent.train()
 		
 
 def runGame():
 	# setup variables for the start of the game
 	board = Board()
 	agent = TetrisAgent(board)
+	agent.setParams(aggregateParam, compLinesParam, holesParam, bumpParam)
 	lastMoveDownTime = time.time()
 	lastMoveSidewaysTime = time.time()
 	lastFallTime = time.time()
