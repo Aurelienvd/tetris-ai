@@ -1,5 +1,5 @@
 class Individual():
-	def __init__(self, aggregateParam, compLinesParam, holesParam, bumpParam, fitness):
+	def __init__(self, aggregateParam, compLinesParam, holesParam, bumpParam, fitness = 0):
 		self.setParams(aggregateParam, compLinesParam, holesParam, bumpParam, fitness)
 
 	def __repr__(self):
@@ -44,3 +44,27 @@ class Individual():
 
 	def getFitness(self):
 		return self.fitness
+
+	def __str__(self):
+		string = ",".join(self.getParams()) + "\n"
+		return string
+
+	@staticmethod
+	def write(individuals, filename = "individuals.sv"):
+		with open(filename, "w") as f:
+			for individuals in individuals:
+				f.write(str(i))
+
+
+	@staticmethod
+	def read(filename = "individuals.sv"):
+		individuals = []
+		with open(filename, "r") as f:
+			individuals = f.readlines()
+		individuals = [(i.strip()).split(",") for i in individuals]
+		for i in range(len(individuals)):
+			params = individuals[i]
+			individuals[i] = Individual(params[0], params[1], params[2], params[3])
+		return individuals
+
+

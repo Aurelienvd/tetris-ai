@@ -14,11 +14,21 @@ ROT = { 'S': 2,
 		'O': 1,
 		'T': 4}
 
+W_LB = -1
+W_UB = 1
+N_GAMES = 10
+N_MOVES = 250
+N_GEN = 30
+POPULATION_SIZE = 100
+TOURNAMENT_SIZE = POPULATION_SIZE//10
+OFFSPRING_SIZE = int(POPULATION_SIZE*0.3)
+MUTATION_RATE = 0.05
+
+
 class TetrisAgent():
 
 	def __init__(self, board):
 		self.board = board
-		self.populationSize = 100
 
 	def setParams(self, paramList):
 		self.nbParams = len(paramList)
@@ -45,10 +55,10 @@ class TetrisAgent():
 		best = None
 		bestScore = None
 
-		nbRot = ROT.get(piece.shape) if not checkForNextPiece else ROT.get(nextPiece.shape)
+		nbRot = ROT.get(piece.shape)
 
 		for i in range(nbRot):
-			workingPiece = (piece.clone() if not checkForNextPiece else nextPiece.clone())
+			workingPiece = piece.clone()
 			workingPiece.rotate((workingPiece.get_rotation() + i) % len(PIECES[workingPiece.get_shape()]))
 
 			while (board.isValidPosition(workingPiece, -1)):
@@ -61,11 +71,7 @@ class TetrisAgent():
 				workingBoard.addToBoard(pieceSet)
 
 				score = 0
-				
-				if(checkForNextPiece):
-					score = self.aggregateParam*workingBoard.computeAggregate() + self.compLinesParam*workingBoard.completeLines() + self.holesParam*workingBoard.computeHoles() + self.bumpParam*workingBoard.computeBumpiness()
-				else:
-					score = self.best(piece, nextPiece, True, workingBoard)[1]
+				score = self.aggregateParam*workingBoard.computeAggregate() + self.compLinesParam*workingBoard.completeLines() + self.holesParam*workingBoard.computeHoles() + self.bumpParam*workingBoard.computeBumpiness()
 
 				if(bestScore == None or score == None or score > bestScore):
 					bestScore = score
@@ -80,17 +86,27 @@ class TetrisAgent():
 
 	def train(self):
 		self.population = []
-		for i in range(self.populationSize):
+		for i in range(POPULATION_SIZE):
 			self.population.append(self.generateRandomIndividual())
 
-		self.computeFitness(5, 200)
+		self.computeFitness(N_GAMES, N_MOVES, self.population)
+
+		for i in range(N_GEN):
+			offsprings = [None]*OFFSPRING_SIZE
+			for i in range(OFFSPRING_SIZE):
+				parents = self.tournamentSelect(TOURNAMENT_SIZE)
+				offspring = self.onePointCrossOver(parents[0], parents[1])
+				self.mutate(offspring)
+				offsprings[i] = offspring
+			self.nextGeneration(offsprings)
+			self.computeFitness(N_GAMES, N_MOVES, offsprings)
 
 	def generateRandomIndividual(self):
-		individual = Individual(random.uniform(-0.5, 0.5), random.uniform(-0.5, 0.5), random.uniform(-0.5, 0.5), random.uniform(-0.5, 0.5), 0)
+		individual = Individual(random.uniform(W_LB, W_UB), random.uniform(W_LB, W_UB), random.uniform(W_LB, W_UB), random.uniform(W_LB, W_UB), 0)
 		return individual
 
-	def computeFitness(self, nbGames, maxNbPieces):
-		for individual in self.population:
+	def computeFitness(self, nbGames, maxNbPieces, population):
+		for individual in population:
 			self.setParams(individual.getParams())
 			totalScore = 0
 			for i in range(nbGames):
@@ -108,8 +124,7 @@ class TetrisAgent():
 					fallingPiece = nextPiece
 					nextPiece = self.board.getNewPiece()
 				totalScore += score
-			print(totalScore)
-			individual.setFitness(totalScore)
+			individual.setFitness(totalScore//nbGames)
 
 	def randomSubset(self, iterator, K):
 		result = []
@@ -135,13 +150,20 @@ class TetrisAgent():
 
 	def onePointCrossOver(self, indiv1, indiv2):
 		index = random.randint(1, self.nbParams)
-		return indiv1[:index] + indiv2[index:]
+		params = indiv1.getParams()[:index] + indiv2.getParams()[index:]
+		return Individual(params[0], params[1], params[2], params[3])
 
 
-	def mutate(self, individual):
-		paramMutating = random.choice(["aggregateParam", "compLinesParam", "holesParam", "bumpParam"])
-		paramValue = getattr(individual, paramMutating)
-		setattr(individual, paramMutating, paramValue * random.gauss(1, 0.2))
+	def mutate(self, offspring):
+		p = random.uniform(0,1)
+		if(p <= MUTATION_RATE):
+			paramMutating = random.choice(["aggregateParam", "compLinesParam", "holesParam", "bumpParam"])
+			paramValue = getattr(offspring, paramMutating)
+			setattr(offspring, paramMutating, paramValue * random.gauss(1, 0.2))
+
+	def nextGeneration(self, offsprings):
+		self.population.sort(key=attrgetter('fitness'))
+		self.population[POPULATION_SIZE-OFFSPRING_SIZE:] = offsprings[:]
 
 
 
