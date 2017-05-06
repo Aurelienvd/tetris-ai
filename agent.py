@@ -17,6 +17,7 @@ class TetrisAgent():
 
 	def __init__(self, board):
 		self.board = board
+		self.populationSize = 100
 
 	def setParams(self, paramList):
 		self.setAggregateParam(paramList[0])
@@ -76,7 +77,9 @@ class TetrisAgent():
 		########## Evolution Algorithm ##########
 
 	def train(self):
-		individual = self.generateRandomIndividual()
+		self.population = []
+		for i in range(self.populationSize):
+			self.population.append(self.generateRandomIndividual())
 
 	def generateRandomIndividual(self):
 		individual = Individual(random.uniform(-0.5, 0.5), random.uniform(-0.5, 0.5), random.uniform(-0.5, 0.5), random.uniform(-0.5, 0.5), 0)
