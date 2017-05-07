@@ -8,6 +8,7 @@ from pygame.locals import *
 from agent import *
 from board import *
 
+
 FPS = 60
 WINDOWWIDTH = 720
 WINDOWHEIGHT = 480
@@ -40,9 +41,14 @@ def main():
 			runGame()
 	elif(sys.argv[1] == "-t"):
 		agent = TetrisAgent(Board())
-		agent.setParams([0,0,0,0])
+		#agent.setParams([0,0,0,0])
 		agent.train()
-		
+
+	elif(sys.argv[1] == "-c"):
+		agent = TetrisAgent(Board())
+		pop, gen = Individual.read()
+		agent.train(pop, gen)
+
 
 def runGame():
 	# setup variables for the start of the game

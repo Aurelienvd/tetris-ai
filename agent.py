@@ -4,6 +4,7 @@ from pygame.locals import *
 from board import *
 from individual import *
 from multiprocessing import Queue, Process
+from collections import Counter
 
 KEYS = (K_RIGHT, K_LEFT, K_UP)
 
@@ -25,7 +26,8 @@ N_GEN = 30
 POPULATION_SIZE = 100
 TOURNAMENT_SIZE = POPULATION_SIZE//10
 OFFSPRING_SIZE = int(POPULATION_SIZE*0.28)
-MUTATION_RATE = 0.05
+MUTATION_RATE = 0.1
+NBPARAMS = 4
 
 
 class TetrisAgent():
@@ -34,7 +36,6 @@ class TetrisAgent():
 		self.board = board
 
 	def setParams(self, paramList):
-		self.nbParams = len(paramList)
 		self.setAggregateParam(paramList[0])
 		self.setCompLinesParam(paramList[1])
 		self.setHolesParam(paramList[2])
@@ -87,27 +88,28 @@ class TetrisAgent():
 
 		########## Evolution Algorithm ##########
 
-	def train(self):
+	def train(self, population = [], gen_ = 0):
 
-		self.population = []
-		for i in range(POPULATION_SIZE):
-			self.population.append(self.generateRandomIndividual())
-		self.distributedFitness(self.population, POPULATION_SIZE)
-		print("Fitness Done")
-		gen = 1
+		self.population = population
+		if self.population == []:
+			for i in range(POPULATION_SIZE):
+				self.population.append(self.generateRandomIndividual())
+			self.distributedFitness(self.population, POPULATION_SIZE)
+			print("Fitness Done")
+		gen = gen_ + 1
 		for i in range(N_GEN):
 			offsprings = [None]*OFFSPRING_SIZE
-			for i in range(OFFSPRING_SIZE):
+			for j in range(OFFSPRING_SIZE):
 				parents = self.tournamentSelect(TOURNAMENT_SIZE)
 				offspring = self.onePointCrossOver(parents[0], parents[1])
 				self.mutate(offspring)
-				offsprings[i] = offspring
+				offsprings[j] = offspring
 			self.distributedFitness(offsprings, OFFSPRING_SIZE)
 			self.nextGeneration(offsprings)
 			print("Gen {0} Done".format(gen))
 			gen = gen + 1
 
-		Individual.write(self.population)
+		Individual.write(self.population, gen)
 
 	def generateRandomIndividual(self):
 		individual = Individual(random.uniform(W_LB, W_UB), random.uniform(W_LB, W_UB), random.uniform(W_LB, W_UB), random.uniform(W_LB, W_UB), 0)
@@ -177,10 +179,9 @@ class TetrisAgent():
 		return (fittest1, fittest2)
 
 	def onePointCrossOver(self, indiv1, indiv2):
-		index = random.randint(1, self.nbParams)
+		index = random.randint(1, NBPARAMS-1)
 		params = indiv1.getParams()[:index] + indiv2.getParams()[index:]
 		return Individual(params[0], params[1], params[2], params[3])
-
 
 	def mutate(self, offspring):
 		p = random.uniform(0,1)
