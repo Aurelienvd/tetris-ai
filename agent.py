@@ -19,15 +19,13 @@ N_PROC = 4
 
 W_LB = -1
 W_UB = 1
-N_GAMES = 8
+N_GAMES = 5
 N_MOVES = 200
 N_GEN = 30
 POPULATION_SIZE = 100
 TOURNAMENT_SIZE = POPULATION_SIZE//10
 OFFSPRING_SIZE = int(POPULATION_SIZE*0.28)
 MUTATION_RATE = 0.05
-
-CHUNK_SIZE = POPULATION_SIZE//N_PROC		# precond: POPULATION_SIZE must be divisible by N_PROC
 
 
 class TetrisAgent():
@@ -117,17 +115,18 @@ class TetrisAgent():
 		return individual
 
 	def distributedFitness(self, population, population_size):
-		assert population_size%N_PROC == 0 
+		assert population_size%N_PROC == 0 	# Precond: population_size divisible by N_PROC
 		q = Queue()
+		chunk_size = population_size//N_PROC
 
 		jobs = []
 		for i in range(N_PROC):
-			p = Process(target=self.computeFitness, args=(population[i*CHUNK_SIZE:(i+1)*CHUNK_SIZE], q))
+			p = Process(target=self.computeFitness, args=(population[i*chunk_size:(i+1)*chunk_size], q))
 			jobs.append(p)
 			p.start()
 
 		for i in range(N_PROC):
-			population[i*CHUNK_SIZE:(i+1)*CHUNK_SIZE] = q.get(True)
+			population[i*chunk_size:(i+1)*chunk_size] = q.get(True)
 
 		for j in jobs:
 			j.join()
@@ -193,7 +192,7 @@ class TetrisAgent():
 
 	def nextGeneration(self, offsprings):
 		self.population.sort(key=attrgetter('fitness'))
-		self.population[POPULATION_SIZE-OFFSPRING_SIZE:] = offsprings[:]
+		self.population[:OFFSPRING_SIZE] = offsprings[:]
 
 
 
