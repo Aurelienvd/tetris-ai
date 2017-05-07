@@ -92,11 +92,13 @@ class TetrisAgent():
 		self.population = []
 		for i in range(POPULATION_SIZE):
 			self.population.append(self.generateRandomIndividual())
-		
+		start = time.time()
 		self.distributedFitness(self.population, POPULATION_SIZE)
 		print("Fitness Done")
+		print(time.time() - start)
 		gen = 1
 		for i in range(N_GEN):
+			start = time.time()
 			offsprings = [None]*OFFSPRING_SIZE
 			for i in range(OFFSPRING_SIZE):
 				parents = self.tournamentSelect(TOURNAMENT_SIZE)
@@ -106,6 +108,7 @@ class TetrisAgent():
 			self.distributedFitness(offsprings, OFFSPRING_SIZE)
 			self.nextGeneration(offsprings)
 			print("Gen {0} Done".format(gen))
+			print(time.time() - start)
 			gen = gen + 1
 
 		Individual.write(self.population)
