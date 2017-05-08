@@ -102,10 +102,10 @@ class TetrisAgent():
 			self.distributedFitness(self.population, POPULATION_SIZE)
 			print("Fitness Done")
 		else:
-			N_MOVES = 200 + (gen_ - 11) * 5
+			N_MOVES = 200 + (gen_ - 11) * 10
 		gen = gen_ + 1
 		for i in range(N_GEN):
-			N_MOVES += 5
+			N_MOVES += 10
 			print(N_MOVES)
 			start = time.time()
 			offsprings = [None]*OFFSPRING_SIZE
