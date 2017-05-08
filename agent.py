@@ -21,8 +21,8 @@ N_PROC = 4
 W_LB = -1
 W_UB = 1
 N_GAMES = 5
+N_GEN = 1
 N_MOVES = 200
-N_GEN = 30
 POPULATION_SIZE = 100
 TOURNAMENT_SIZE = POPULATION_SIZE//10
 OFFSPRING_SIZE = int(POPULATION_SIZE*0.28)
@@ -59,10 +59,10 @@ class TetrisAgent():
 		best = None
 		bestScore = None
 
-		nbRot = ROT.get(piece.shape)
+		nbRot = ROT.get(piece.shape) if not checkForNextPiece else ROT.get(nextPiece.shape)
 
 		for i in range(nbRot):
-			workingPiece = piece.clone()
+			workingPiece = (piece.clone() if not checkForNextPiece else nextPiece.clone())
 			workingPiece.rotate((workingPiece.get_rotation() + i) % len(PIECES[workingPiece.get_shape()]))
 
 			while (board.isValidPosition(workingPiece, -1)):
@@ -75,7 +75,11 @@ class TetrisAgent():
 				workingBoard.addToBoard(pieceSet)
 
 				score = 0
-				score = self.aggregateParam*workingBoard.computeAggregate() + self.compLinesParam*workingBoard.completeLines() + self.holesParam*workingBoard.computeHoles() + self.bumpParam*workingBoard.computeBumpiness()
+				
+				if(checkForNextPiece):
+					score = self.aggregateParam*workingBoard.computeAggregate() + self.compLinesParam*workingBoard.completeLines() + self.holesParam*workingBoard.computeHoles() + self.bumpParam*workingBoard.computeBumpiness()
+				else:
+					score = self.best(piece, nextPiece, True, workingBoard)[1]
 
 				if(bestScore == None or score == None or score > bestScore):
 					bestScore = score
@@ -83,6 +87,7 @@ class TetrisAgent():
 				workingPiece.move_right()
 
 		return [(best.clone() if best != None else piece), bestScore]
+
 
 
 
@@ -96,8 +101,13 @@ class TetrisAgent():
 				self.population.append(self.generateRandomIndividual())
 			self.distributedFitness(self.population, POPULATION_SIZE)
 			print("Fitness Done")
+		else:
+			N_MOVES = 200 + (gen_ - 11) * 5
 		gen = gen_ + 1
 		for i in range(N_GEN):
+			N_MOVES += 5
+			print(N_MOVES)
+			start = time.time()
 			offsprings = [None]*OFFSPRING_SIZE
 			for j in range(OFFSPRING_SIZE):
 				parents = self.tournamentSelect(TOURNAMENT_SIZE)
@@ -107,6 +117,7 @@ class TetrisAgent():
 			self.distributedFitness(offsprings, OFFSPRING_SIZE)
 			self.nextGeneration(offsprings)
 			print("Gen {0} Done".format(gen))
+			print(time.time()-start)
 			gen = gen + 1
 
 		Individual.write(self.population, gen)

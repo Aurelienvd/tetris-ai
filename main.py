@@ -7,6 +7,7 @@ import sys
 from pygame.locals import *
 from agent import *
 from board import *
+import cProfile
 
 
 FPS = 60
@@ -20,8 +21,8 @@ MOVEDOWNFREQ = 0.1
 XMARGIN = int((WINDOWWIDTH - BOARDWIDTH * BOXSIZE) / 2)
 TOPMARGIN = WINDOWHEIGHT - (BOARDHEIGHT * BOXSIZE) - 5
 
-IA_PARAMS = [-0.510066, 0.760666, -0.35663, -0.184483]
-
+#IA_PARAMS = [-0.510066, 0.760666, -0.35663, -0.184483]
+IA_PARAMS = [-0.2548597909717818,0.8675694905501019,-0.8975174536762058,-0.31478386254215707]
 
 #assert len(COLORS) == len(LIGHTCOLORS) # each color must have light color
 
@@ -41,7 +42,6 @@ def main():
 			runGame()
 	elif(sys.argv[1] == "-t"):
 		agent = TetrisAgent(Board())
-		#agent.setParams([0,0,0,0])
 		agent.train()
 
 	elif(sys.argv[1] == "-c"):
@@ -66,6 +66,7 @@ def runGame():
 	fallingPiece = board.getNewPiece()
 	nextPiece = board.getNewPiece()
 	fallingPiece = agent.best(fallingPiece, nextPiece, False, board)[0]
+	cProfile.run('agent.best(fallingPiece, nextPiece, False, board)[0]')
 
 	while True: # game loop
 		if fallingPiece == None:
@@ -77,6 +78,7 @@ def runGame():
 			fallingPiece = agent.best(fallingPiece, nextPiece, False, board)[0]	
 
 			if not board.isValidPosition(fallingPiece):
+				print(score)
 				break # can't fit a new piece on the board, so game over
 
 		checkForQuit()
