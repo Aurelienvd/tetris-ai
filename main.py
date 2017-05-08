@@ -7,7 +7,6 @@ import sys
 from pygame.locals import *
 from agent import *
 from board import *
-import cProfile
 
 
 FPS = 60
@@ -66,7 +65,6 @@ def runGame():
 	fallingPiece = board.getNewPiece()
 	nextPiece = board.getNewPiece()
 	fallingPiece = agent.best(fallingPiece, nextPiece, False, board)[0]
-	cProfile.run('agent.best(fallingPiece, nextPiece, False, board)[0]')
 
 	while True: # game loop
 		if fallingPiece == None:
