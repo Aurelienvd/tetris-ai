@@ -10,9 +10,9 @@ from board import *
 
 
 FPS = 60
-WINDOWWIDTH = 720
-WINDOWHEIGHT = 480
-BOXSIZE = 20
+WINDOWWIDTH = 960
+WINDOWHEIGHT = 640
+BOXSIZE = 30
 
 MOVESIDEWAYSFREQ = 0.15
 MOVEDOWNFREQ = 0.1
@@ -31,6 +31,7 @@ def main():
 		print("Need at least one argument : \n-r for a normal run of the tetris game\n-t to run train the IA")
 	elif(sys.argv[1] == "-r"):
 		global FPSCLOCK, DISPLAYSURF, BASICFONT, BIGFONT
+		random.seed(42)
 		pygame.init()
 		FPSCLOCK = pygame.time.Clock()
 		DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
