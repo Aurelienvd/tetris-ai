@@ -8,13 +8,7 @@ from collections import Counter
 
 KEYS = (K_RIGHT, K_LEFT, K_UP)
 
-ROT = { 'S': 2,
-		'Z': 2,
-		'J': 4,
-		'L': 4,
-		'I': 2,
-		'O': 1,
-		'T': 4}
+
 
 N_PROC = 4
 
